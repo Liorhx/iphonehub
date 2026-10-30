@@ -15,9 +15,9 @@ import {
   ChevronRight,
   Zap,
 } from 'lucide-react';
-import { getProducts } from '@/services/product.service';
-import ProductCard from '@/components/products/ProductCard';
-import { formatPrice } from '@/lib/utils';
+import { getProducts } from '../services/product.service';
+import ProductCard from '../components/products/ProductCard';
+import { formatPrice } from '../lib/utils';
 
 export const revalidate = 60;
 

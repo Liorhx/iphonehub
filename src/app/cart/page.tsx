@@ -16,8 +16,8 @@ import {
   Truck,
   RotateCcw,
 } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/lib/utils';
+import { useCart } from '../../context/CartContext';
+import { formatPrice } from '../../lib/utils';
 
 export default function CartPage() {
   const router = useRouter();

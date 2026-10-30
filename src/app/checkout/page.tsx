@@ -16,9 +16,9 @@ import {
   Check,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/lib/utils';
-import { PaymentMethod } from '@/types';
+import { useCart } from '../../context/CartContext';
+import { formatPrice } from '../../lib/utils';
+import { PaymentMethod } from '../../types';
 
 declare global {
   interface Window {

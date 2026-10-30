@@ -19,11 +19,11 @@ import {
   CreditCard,
   RotateCcw,
 } from 'lucide-react';
-import { Product } from '@/types';
-import { INITIAL_PRODUCTS } from '@/data/mockProducts';
-import { formatPrice, calculateDiscount } from '@/lib/utils';
-import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
+import { Product } from '../../../types';
+import { INITIAL_PRODUCTS } from '../../../data/mockProducts';
+import { formatPrice, calculateDiscount } from '../../../lib/utils';
+import { useCart } from '../../../context/CartContext';
+import { useWishlist } from '../../../context/WishlistContext';
 
 export default function ProductDetailPage({
   params,

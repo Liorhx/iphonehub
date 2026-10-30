@@ -22,9 +22,9 @@ import {
   AlertTriangle,
   RotateCcw,
 } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
-import { Product, Order, TradeIn, OrderStatus } from '@/types';
-import { INITIAL_PRODUCTS } from '@/data/mockProducts';
+import { formatPrice } from '../../lib/utils';
+import { Product, Order, TradeIn, OrderStatus } from '../../types';
+import { INITIAL_PRODUCTS } from '../../data/mockProducts';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'tradeins' | 'coupons'>('overview');

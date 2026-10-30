@@ -20,9 +20,9 @@ import {
   CreditCard,
   MapPin,
 } from 'lucide-react';
-import { SUPPORTED_TRADE_IN_MODELS, calculateTradeInQuote } from '@/lib/tradeInPricing';
-import { formatPrice } from '@/lib/utils';
-import { DeviceCondition, TradeInIssues } from '@/types';
+import { SUPPORTED_TRADE_IN_MODELS, calculateTradeInQuote } from '../../lib/tradeInPricing';
+import { formatPrice } from '../../lib/utils';
+import { DeviceCondition, TradeInIssues } from '../../types';
 
 export default function SellPage() {
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);

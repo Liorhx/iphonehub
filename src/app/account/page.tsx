@@ -19,9 +19,9 @@ import {
   Shield,
   Smartphone,
 } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
-import { Order, TradeIn } from '@/types';
-import { useWishlist } from '@/context/WishlistContext';
+import { formatPrice } from '../../lib/utils';
+import { Order, TradeIn } from '../../types';
+import { useWishlist } from '../../context/WishlistContext';
 
 export default function AccountPage() {
   const { data: session } = useSession();

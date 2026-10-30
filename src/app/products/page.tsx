@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, ArrowUpDown, Smartphone } from 'lucide-react';
-import ProductCard from '@/components/products/ProductCard';
-import FilterSidebar from '@/components/products/FilterSidebar';
-import { Product } from '@/types';
-import { INITIAL_PRODUCTS } from '@/data/mockProducts';
+import ProductCard from '../../components/products/ProductCard';
+import FilterSidebar from '../../components/products/FilterSidebar';
+import { Product } from '../../types';
+import { INITIAL_PRODUCTS } from '../../data/mockProducts';
 
 function ProductsContent() {
   const searchParams = useSearchParams();
