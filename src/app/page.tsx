@@ -237,15 +237,19 @@ export default async function HomePage() {
 
           {/* Section: Shop by iPhone */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-extrabold text-zinc-900 tracking-tight">
-                Shop by iPhone
-              </h2>
+            <div className="flex items-center justify-between mb-3.5">
+              <div>
+                <h2 className="text-base font-black text-zinc-950 tracking-tight">
+                  Shop by iPhone
+                </h2>
+                <p className="text-[11px] text-zinc-500 font-medium">Certified pre-owned with 1-yr warranty</p>
+              </div>
               <Link
                 href="/products"
-                className="text-xs font-semibold text-zinc-400 hover:text-zinc-700 flex items-center gap-0.5"
+                className="text-xs font-bold text-brand-emerald hover:text-emerald-700 flex items-center gap-0.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 transition active:scale-95"
               >
-                View All <ChevronRight className="w-3.5 h-3.5" />
+                <span>View All</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -254,10 +258,14 @@ export default async function HomePage() {
               {/* iPhone 16 */}
               <Link
                 href="/products?family=iPhone%2016"
-                className="bg-zinc-50/90 rounded-2xl border border-zinc-200/70 p-2.5 flex flex-col items-center text-center hover:bg-zinc-100/80 active:scale-95 transition-all"
+                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
               >
-                <div className="relative w-full h-16 flex items-center justify-center">
-                  <div className="relative w-9 h-14 -mr-2 z-0 opacity-90 scale-95">
+                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
+                  {/* Soft ambient floor shadow */}
+                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+                  
+                  {/* Secondary offset phone */}
+                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 16 White"
@@ -265,7 +273,8 @@ export default async function HomePage() {
                       className="object-contain"
                     />
                   </div>
-                  <div className="relative w-10 h-16 z-10 drop-shadow-md">
+                  {/* Primary front phone with subtle smooth float */}
+                  <div className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105">
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 16 Black"
@@ -274,16 +283,25 @@ export default async function HomePage() {
                     />
                   </div>
                 </div>
-                <span className="text-xs font-bold text-zinc-900 mt-2">iPhone 16</span>
+                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
+                  iPhone 16
+                </span>
+                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
+                  From ₹58,999
+                </span>
               </Link>
 
               {/* iPhone 15 */}
               <Link
                 href="/products?family=iPhone%2015"
-                className="bg-zinc-50/90 rounded-2xl border border-zinc-200/70 p-2.5 flex flex-col items-center text-center hover:bg-zinc-100/80 active:scale-95 transition-all"
+                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
               >
-                <div className="relative w-full h-16 flex items-center justify-center">
-                  <div className="relative w-9 h-14 -mr-2 z-0 opacity-90 scale-95">
+                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
+                  {/* Soft ambient floor shadow */}
+                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+                  
+                  {/* Secondary offset phone */}
+                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pink-select-202309?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 15 Pink"
@@ -291,7 +309,11 @@ export default async function HomePage() {
                       className="object-contain"
                     />
                   </div>
-                  <div className="relative w-10 h-16 z-10 drop-shadow-md">
+                  {/* Primary front phone with subtle smooth float */}
+                  <div
+                    className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105"
+                    style={{ animationDelay: '0.8s' }}
+                  >
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-blue-select-202309?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 15 Blue"
@@ -300,16 +322,25 @@ export default async function HomePage() {
                     />
                   </div>
                 </div>
-                <span className="text-xs font-bold text-zinc-900 mt-2">iPhone 15</span>
+                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
+                  iPhone 15
+                </span>
+                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
+                  From ₹48,999
+                </span>
               </Link>
 
               {/* iPhone 14 */}
               <Link
                 href="/products?family=iPhone%2014"
-                className="bg-zinc-50/90 rounded-2xl border border-zinc-200/70 p-2.5 flex flex-col items-center text-center hover:bg-zinc-100/80 active:scale-95 transition-all"
+                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
               >
-                <div className="relative w-full h-16 flex items-center justify-center">
-                  <div className="relative w-9 h-14 -mr-2 z-0 opacity-90 scale-95">
+                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
+                  {/* Soft ambient floor shadow */}
+                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
+                  
+                  {/* Secondary offset phone */}
+                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-blue-select-202209?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 14 Blue"
@@ -317,7 +348,11 @@ export default async function HomePage() {
                       className="object-contain"
                     />
                   </div>
-                  <div className="relative w-10 h-16 z-10 drop-shadow-md">
+                  {/* Primary front phone with subtle smooth float */}
+                  <div
+                    className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105"
+                    style={{ animationDelay: '1.6s' }}
+                  >
                     <Image
                       src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-midnight-select-202209?wid=940&hei=1112&fmt=png-alpha"
                       alt="iPhone 14 Midnight"
@@ -326,7 +361,12 @@ export default async function HomePage() {
                     />
                   </div>
                 </div>
-                <span className="text-xs font-bold text-zinc-900 mt-2">iPhone 14</span>
+                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
+                  iPhone 14
+                </span>
+                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
+                  From ₹38,999
+                </span>
               </Link>
             </div>
           </div>

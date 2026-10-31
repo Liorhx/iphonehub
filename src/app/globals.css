@@ -105,5 +105,20 @@ input:-webkit-autofill:focus {
   animation: neonWave 8s ease-in-out infinite;
 }
 
+/* Very subtle smooth floating for product cards */
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3.5px);
+  }
+}
+
+.animate-subtleFloat {
+  animation: subtleFloat 4s ease-in-out infinite;
+}
+
+
 
 
