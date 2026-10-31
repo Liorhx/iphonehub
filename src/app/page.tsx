@@ -20,6 +20,7 @@ import {
 import { getProducts } from '../services/product.service';
 import ProductCard from '../components/products/ProductCard';
 import { formatPrice } from '../lib/utils';
+import PromoCarousel from '../components/home/PromoCarousel';
 
 export const revalidate = 60;
 
@@ -371,39 +372,8 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Section: Upgrade Your iPhone Promo Card */}
-          <div className="relative rounded-2xl bg-gradient-to-r from-[#0C1210] via-[#091811] to-[#0A2216] border border-emerald-950/60 p-4 text-white overflow-hidden shadow-sm">
-            {/* Subtle Neon Glow */}
-            <div className="absolute right-0 top-0 bottom-0 w-36 bg-emerald-500/20 blur-xl pointer-events-none" />
-
-            <div className="flex items-center justify-between gap-2 relative z-10">
-              <div className="space-y-1 max-w-[62%]">
-                <h3 className="font-extrabold text-base tracking-tight text-white leading-tight">
-                  Upgrade Your iPhone
-                </h3>
-                <p className="text-[11px] text-zinc-300 leading-tight">
-                  Get the best value for your old iPhone with instant quote and doorstep pickup.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    href="/sell"
-                    className="inline-flex items-center gap-1 bg-white text-zinc-950 font-bold text-xs px-4 py-2 rounded-full shadow hover:bg-zinc-100 active:scale-95 transition-all"
-                  >
-                    Sell Now →
-                  </Link>
-                </div>
-              </div>
-
-              <div className="relative w-24 h-28 shrink-0">
-                <Image
-                  src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha"
-                  alt="Upgrade iPhone"
-                  fill
-                  className="object-contain scale-125 translate-x-3 translate-y-1 drop-shadow-xl"
-                />
-              </div>
-            </div>
-          </div>
+          {/* Section: Dynamic Promo Cards Carousel */}
+          <PromoCarousel />
 
           {/* Section: Why Choose iPhoneHub? (4 horizontal icons) */}
           <div>
