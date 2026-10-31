@@ -3,7 +3,7 @@ import { ShieldCheck, Truck, RefreshCw, Zap } from 'lucide-react';
 
 export default function AnnouncementBar() {
   return (
-    <div className="bg-brand-black text-white text-xs py-2 px-4 border-b border-zinc-800">
+    <div className="hidden md:block bg-brand-black text-white text-xs py-2 px-4 border-b border-zinc-800">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="hidden sm:flex items-center gap-6 text-zinc-400">
           <span className="flex items-center gap-1.5 hover:text-white transition-colors">

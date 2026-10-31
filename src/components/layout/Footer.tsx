@@ -91,8 +91,8 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm text-zinc-300">
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-brand-emerald shrink-0" />
-                <a href="tel:+919876543210" className="hover:text-brand-emerald transition-colors">
-                  +91 98765 43210
+                <a href="tel:+919044914653" className="hover:text-brand-emerald transition-colors">
+                  +91 90449 14653
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
@@ -103,7 +103,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2.5 text-xs text-zinc-400">
                 <MapPin className="w-4 h-4 text-brand-emerald shrink-0 mt-0.5" />
-                <span>Indiranagar 100ft Road, Bengaluru, Karnataka 560038</span>
+                <span>Lucknow</span>
               </li>
             </ul>
           </div>

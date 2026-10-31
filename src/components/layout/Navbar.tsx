@@ -52,21 +52,39 @@ export default function Navbar() {
     }
   };
 
+  const isHomePage = pathname === '/';
+
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-zinc-200/80 transition-all duration-200">
+      <header
+        className={`sticky top-0 z-40 transition-all duration-200 ${
+          isHomePage
+            ? 'bg-[#0B0B0C] border-b border-zinc-900/80 text-white md:bg-white/95 md:border-b md:border-zinc-200/80 md:text-brand-black md:backdrop-blur-md'
+            : 'bg-white/95 backdrop-blur-md border-b border-zinc-200/80 text-brand-black'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-brand-black flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform duration-200">
-              <Smartphone className="w-5 h-5 text-brand-emerald" />
+            <div
+              className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-105 ${
+                isHomePage
+                  ? 'bg-zinc-900 border border-zinc-800 text-white md:bg-brand-black md:border-transparent'
+                  : 'bg-brand-black text-white'
+              }`}
+            >
+              <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 text-brand-emerald" />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight text-brand-black flex items-center">
-                iPhone<span className="text-brand-emerald">Hub</span>
+              <span
+                className={`font-extrabold text-xl tracking-tight flex items-center ${
+                  isHomePage ? 'text-white md:text-brand-black' : 'text-brand-black'
+                }`}
+              >
+                iPhone<span className={isHomePage ? 'text-white md:text-brand-emerald' : 'text-brand-emerald'}>Hub</span>
               </span>
-              <span className="text-[9px] uppercase tracking-widest text-zinc-600 font-semibold -mt-1 hidden sm:block">
+              <span className="text-[9px] uppercase tracking-widest text-zinc-500 font-semibold -mt-1 hidden sm:block">
                 Premium Resale
               </span>
             </div>
@@ -107,22 +125,26 @@ export default function Navbar() {
             {/* Search Trigger */}
             <button
               onClick={() => setSearchModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 text-zinc-700 hover:text-brand-black hover:bg-zinc-100 rounded-full sm:rounded-xl text-sm font-normal flex items-center gap-2 transition-colors border border-transparent sm:border-zinc-200"
+              className={`p-2 sm:px-3 sm:py-2 rounded-full sm:rounded-xl text-sm font-normal flex items-center gap-2 transition-colors border border-transparent ${
+                isHomePage
+                  ? 'text-zinc-200 hover:text-white hover:bg-zinc-800/80 md:text-zinc-700 md:hover:text-brand-black md:hover:bg-zinc-100 md:border-zinc-200'
+                  : 'text-zinc-700 hover:text-brand-black hover:bg-zinc-100 sm:border-zinc-200'
+              }`}
               title="Search iPhones"
             >
-              <Search className="w-4 h-4 text-zinc-500" />
+              <Search className={`w-5 h-5 sm:w-4 sm:h-4 ${isHomePage ? 'text-zinc-200 md:text-zinc-500' : 'text-zinc-500'}`} />
               <span className="hidden lg:inline text-xs text-zinc-400">Search model...</span>
             </button>
 
-            {/* Wishlist Icon */}
+            {/* Wishlist Icon (Desktop only, mobile has bottom bar) */}
             <Link
               href="/account?tab=wishlist"
-              className="relative p-2 text-zinc-700 hover:text-brand-black hover:bg-zinc-100 rounded-full transition-colors"
+              className="hidden md:flex relative p-2 text-zinc-700 hover:text-brand-black hover:bg-zinc-100 rounded-full transition-colors"
               title="Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistCount > 0 && (
-                <span className="absolute 0 top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
@@ -131,19 +153,25 @@ export default function Navbar() {
             {/* Cart Icon */}
             <Link
               href="/cart"
-              className="relative p-2 text-zinc-700 hover:text-brand-black hover:bg-zinc-100 rounded-full transition-colors"
+              className={`relative p-2 rounded-full transition-colors ${
+                isHomePage
+                  ? 'text-zinc-200 hover:text-white hover:bg-zinc-800/80 md:text-zinc-700 md:hover:text-brand-black md:hover:bg-zinc-100'
+                  : 'text-zinc-700 hover:text-brand-black hover:bg-zinc-100'
+              }`}
               title="Cart"
             >
               <ShoppingBag className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-brand-emerald text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+              {totalItems > 0 ? (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
                   {totalItems}
                 </span>
+              ) : (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500" />
               )}
             </Link>
 
-            {/* Account Dropdown */}
-            <div className="relative">
+            {/* Account Dropdown (Desktop) */}
+            <div className="relative hidden md:block">
               {session ? (
                 <button
                   onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
@@ -243,14 +271,16 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Mobile Hamburger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
-              aria-label="Toggle Menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile Hamburger Button (Hidden on Home screen matching native mockup) */}
+            {!isHomePage && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 text-zinc-700 hover:bg-zinc-100 rounded-lg transition-colors"
+                aria-label="Toggle Menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            )}
           </div>
         </div>
       </header>
