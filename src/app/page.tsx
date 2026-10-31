@@ -236,139 +236,113 @@ export default async function HomePage() {
         {/* Curved White Bottom Sheet Container */}
         <div className="rounded-t-[32px] bg-white -mt-4 pt-6 px-4 pb-8 space-y-6 shadow-2xl relative z-10">
 
-          {/* Section: Shop by iPhone */}
+          {/* Section: Shop by iPhone (Cashify Style with Large Device Imagery & Smooth Motion) */}
           <div>
             <div className="flex items-center justify-between mb-3.5">
               <div>
                 <h2 className="text-base font-black text-zinc-950 tracking-tight">
                   Shop by iPhone
                 </h2>
-                <p className="text-[11px] text-zinc-500 font-medium">Certified pre-owned with 1-yr warranty</p>
+                <p className="text-[11px] text-zinc-500 font-medium">Certified pre-owned models with 1-yr warranty</p>
               </div>
               <Link
                 href="/products"
-                className="text-xs font-bold text-brand-emerald hover:text-emerald-700 flex items-center gap-0.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 transition active:scale-95"
+                className="text-xs font-bold text-brand-emerald hover:text-emerald-700 flex items-center gap-0.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 transition active:scale-95 shrink-0"
               >
                 <span>View All</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            {/* 3 Model Cards in a Row */}
-            <div className="grid grid-cols-3 gap-2.5">
-              {/* iPhone 16 */}
-              <Link
-                href="/products?family=iPhone%2016"
-                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
-              >
-                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
-                  {/* Soft ambient floor shadow */}
-                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-                  
-                  {/* Secondary offset phone */}
-                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-white?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 16 White"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  {/* Primary front phone with subtle smooth float */}
-                  <div className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105">
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-black?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 16 Black"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
-                  iPhone 16
-                </span>
-                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
-                  From ₹58,999
-                </span>
-              </Link>
+            {/* Horizontal Swipeable Track with Large 3D Cards */}
+            <div className="-mx-4 px-4 overflow-x-auto no-scrollbar snap-x snap-mandatory flex gap-3 pb-2 pt-1">
+              {[
+                {
+                  series: 'iPhone 16 Series',
+                  tag: 'Latest 2024',
+                  tagColor: 'bg-emerald-50 text-emerald-800 border-emerald-200/70',
+                  price: 'From ₹58,999',
+                  href: '/products?family=iPhone%2016',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha',
+                  delay: '0s',
+                },
+                {
+                  series: 'iPhone 15 Series',
+                  tag: 'Hot Seller',
+                  tagColor: 'bg-blue-50 text-blue-700 border-blue-200/70',
+                  price: 'From ₹48,999',
+                  href: '/products?family=iPhone%2015',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-blue-select-202309?wid=940&hei=1112&fmt=png-alpha',
+                  delay: '0.4s',
+                },
+                {
+                  series: 'iPhone 14 Series',
+                  tag: 'Best Value',
+                  tagColor: 'bg-purple-50 text-purple-700 border-purple-200/70',
+                  price: 'From ₹38,999',
+                  href: '/products?family=iPhone%2014',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-purple-select-202209?wid=940&hei=1112&fmt=png-alpha',
+                  delay: '0.8s',
+                },
+                {
+                  series: 'iPhone 13 Series',
+                  tag: 'Trending',
+                  tagColor: 'bg-amber-50 text-amber-700 border-amber-200/70',
+                  price: 'From ₹30,999',
+                  href: '/products?family=iPhone%2013',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-starlight-select-2021?wid=940&hei=1112&fmt=png-alpha',
+                  delay: '1.2s',
+                },
+                {
+                  series: 'iPhone 12 Series',
+                  tag: 'Budget Pick',
+                  tagColor: 'bg-sky-50 text-sky-700 border-sky-200/70',
+                  price: 'From ₹24,999',
+                  href: '/products?family=iPhone%2012',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-blue-select-2020?wid=940&hei=1112&fmt=png-alpha',
+                  delay: '1.6s',
+                },
+              ].map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={item.href}
+                  className="w-[136px] sm:w-[152px] shrink-0 snap-start bg-gradient-to-b from-white via-zinc-50/70 to-white rounded-3xl border border-zinc-200/90 p-3 pt-3.5 pb-3 flex flex-col items-center justify-between text-center shadow-xs hover:border-emerald-500/50 hover:shadow-card transition-all duration-300 group select-none active:scale-95"
+                >
+                  {/* Category Pill Tag */}
+                  <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${item.tagColor}`}>
+                    {item.tag}
+                  </span>
 
-              {/* iPhone 15 */}
-              <Link
-                href="/products?family=iPhone%2015"
-                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
-              >
-                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
-                  {/* Soft ambient floor shadow */}
-                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-                  
-                  {/* Secondary offset phone */}
-                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pink-select-202309?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 15 Pink"
-                      fill
-                      className="object-contain"
-                    />
+                  {/* Prominent Large 3D Device Image */}
+                  <div className="relative w-full h-32 flex items-center justify-center my-1.5">
+                    {/* Soft floor shadow */}
+                    <div className="absolute bottom-1 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-125 transition-transform duration-300" />
+                    
+                    {/* Phone Image with Gentle Floating Motion */}
+                    <div
+                      className="relative w-24 h-30 drop-shadow-[0_12px_22px_rgba(0,0,0,0.15)] animate-subtleFloat group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-300"
+                      style={{ animationDelay: item.delay }}
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.series}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
                   </div>
-                  {/* Primary front phone with subtle smooth float */}
-                  <div
-                    className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105"
-                    style={{ animationDelay: '0.8s' }}
-                  >
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-blue-select-202309?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 15 Blue"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
-                  iPhone 15
-                </span>
-                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
-                  From ₹48,999
-                </span>
-              </Link>
 
-              {/* iPhone 14 */}
-              <Link
-                href="/products?family=iPhone%2014"
-                className="bg-gradient-to-b from-zinc-50/90 to-white rounded-3xl border border-zinc-200/90 p-2.5 pt-3 pb-2.5 flex flex-col items-center text-center shadow-xs hover:border-zinc-300 hover:shadow-subtle active:scale-[0.98] transition-all group overflow-hidden"
-              >
-                <div className="relative w-full h-24 sm:h-28 flex items-center justify-center">
-                  {/* Soft ambient floor shadow */}
-                  <div className="absolute bottom-0 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-                  
-                  {/* Secondary offset phone */}
-                  <div className="relative w-12 h-20 -mr-3.5 z-0 opacity-75 scale-95 transition-transform duration-300 group-hover:-translate-x-1">
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-blue-select-202209?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 14 Blue"
-                      fill
-                      className="object-contain"
-                    />
+                  {/* Title & Price */}
+                  <div className="space-y-0.5">
+                    <span className="font-black text-xs text-zinc-950 tracking-tight group-hover:text-brand-emerald transition-colors block line-clamp-1">
+                      {item.series}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-extrabold block">
+                      {item.price}
+                    </span>
                   </div>
-                  {/* Primary front phone with subtle smooth float */}
-                  <div
-                    className="relative w-14 h-22 z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] animate-subtleFloat transition-transform duration-300 group-hover:scale-105"
-                    style={{ animationDelay: '1.6s' }}
-                  >
-                    <Image
-                      src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-midnight-select-202209?wid=940&hei=1112&fmt=png-alpha"
-                      alt="iPhone 14 Midnight"
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-                <span className="text-xs font-black text-zinc-950 mt-2 tracking-tight group-hover:text-brand-emerald transition-colors">
-                  iPhone 14
-                </span>
-                <span className="text-[10px] text-zinc-400 font-semibold mt-0.5">
-                  From ₹38,999
-                </span>
-              </Link>
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -397,7 +371,7 @@ export default async function HomePage() {
               <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#080A0E] to-transparent z-10" />
 
               {/* Marquee Track (Duplicated 2x for Seamless Infinite Loop) */}
-              <div className="animate-marquee flex items-center gap-3">
+              <div className="animate-[marquee_8s_linear_infinite] flex items-center gap-3">
                 {[
                   {
                     icon: Tag,
