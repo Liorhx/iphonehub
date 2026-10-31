@@ -112,71 +112,122 @@ export default async function HomePage() {
           ========================================================================= */}
       <div className="block md:hidden">
 
-        {/* Mobile Hero Section with Ambient Neon Wave */}
-        <section className="relative bg-[#0B0B0C] text-white pt-3 pb-8 px-4 overflow-hidden">
-          {/* Subtle Green Neon Wave on Right */}
-          <div className="absolute -right-12 -top-6 w-56 h-56 bg-emerald-500/25 blur-3xl rounded-full pointer-events-none" />
-          <div className="absolute right-0 top-12 w-44 h-44 bg-emerald-400/20 blur-2xl rounded-full pointer-events-none" />
+        {/* Mobile Hero Section with Dynamic 3D Motion & Ambient Neon Glow */}
+        <section className="relative bg-[#070809] text-white pt-2.5 pb-7 px-4 overflow-hidden">
+          {/* Ambient Multi-Layer Neon Wave Behind Phone */}
+          <div className="absolute -right-16 -top-8 w-64 h-64 bg-emerald-500/25 blur-3xl rounded-full pointer-events-none animate-pulseGlow" />
+          <div className="absolute right-[-10px] top-6 w-48 h-48 bg-[#00DF82]/20 blur-2xl rounded-full pointer-events-none animate-neonWave" />
+          <div className="absolute right-12 top-20 w-32 h-32 bg-cyan-400/15 blur-xl rounded-full pointer-events-none" />
+
+          {/* Subtle Ambient Radial Light Spotlight */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_20%,rgba(0,223,130,0.12),transparent_70%)] pointer-events-none" />
 
           <div className="flex items-center justify-between gap-2 relative z-10">
-            {/* Left Headline & Action Buttons */}
-            <div className="space-y-3.5 max-w-[58%]">
-              <div>
-                <h1 className="text-[26px] font-black tracking-tight text-white leading-[1.15]">
-                  Premium iPhones.
-                </h1>
-                <span className="text-[26px] font-black tracking-tight text-[#00DF82] leading-[1.15] block">
-                  Better Prices.
+            {/* Left Headline, Trust Badge & Action Buttons */}
+            <div className="space-y-3 max-w-[58%]">
+              {/* Live Certified Badge */}
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[#00DF82] text-[10px] font-black tracking-wide backdrop-blur-md">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00DF82] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00DF82]" />
                 </span>
-                <p className="text-zinc-400 text-xs font-normal mt-1.5">
-                  Trusted by 50,000+ customers.
-                </p>
+                <span>APPLE CERTIFIED HUB</span>
               </div>
 
-              {/* Stacked Pill Buttons */}
-              <div className="space-y-2 pt-1">
+              {/* Main Headline */}
+              <div>
+                <h1 className="text-[26px] font-black tracking-tight text-white leading-[1.12]">
+                  Premium iPhones.
+                </h1>
+                <span className="text-[26px] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#00DF82] via-[#2CEAA0] to-emerald-300 leading-[1.12] block drop-shadow-[0_0_24px_rgba(0,223,130,0.35)]">
+                  Better Prices.
+                </span>
+                <div className="flex items-center gap-1.5 pt-1 text-zinc-400 text-xs">
+                  <span className="text-amber-400 tracking-tighter text-[11px] font-bold">★★★★★</span>
+                  <span className="text-[11px] font-semibold text-zinc-300">50k+ Happy Buyers</span>
+                </div>
+              </div>
+
+              {/* Interactive Stacked Pill Buttons */}
+              <div className="space-y-2 pt-0.5">
                 <Link
                   href="/products"
-                  className="w-full inline-flex items-center justify-between bg-white text-zinc-950 font-bold text-xs px-4 py-2.5 rounded-full shadow-sm active:scale-95 transition-all"
+                  className="group w-full inline-flex items-center justify-between bg-white hover:bg-zinc-100 text-zinc-950 font-extrabold text-xs px-4 py-2.5 rounded-full shadow-[0_4px_16px_rgba(255,255,255,0.18)] active:scale-95 transition-all"
                 >
                   <span>Explore iPhones</span>
-                  <span className="text-zinc-950 text-sm font-bold">→</span>
+                  <span className="text-zinc-950 text-sm font-black group-hover:translate-x-1 transition-transform">→</span>
                 </Link>
                 <Link
                   href="/sell"
-                  className="w-full inline-flex items-center justify-between bg-[#141416]/90 border border-zinc-700/80 text-white font-semibold text-xs px-4 py-2.5 rounded-full active:scale-95 transition-all"
+                  className="group w-full inline-flex items-center justify-between bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 hover:border-emerald-500/50 text-white font-bold text-xs px-4 py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-all"
                 >
-                  <span>Sell / Trade-in</span>
-                  <span className="text-zinc-400 text-sm font-bold">→</span>
+                  <span className="flex items-center gap-1.5">
+                    <span>Sell / Trade-in</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-[#00DF82] font-black border border-emerald-500/30">+₹2.5k</span>
+                  </span>
+                  <span className="text-zinc-400 group-hover:text-white text-sm font-black group-hover:translate-x-1 transition-transform">→</span>
                 </Link>
               </div>
             </div>
 
-            {/* Right Angled iPhone 15 Pro Titanium */}
-            <div className="relative w-36 h-56 -mr-2 shrink-0">
-              <Image
-                src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha"
-                alt="iPhone 15 Pro Titanium"
-                fill
-                priority
-                className="object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] scale-110"
-              />
+            {/* Right Dynamic 3D Layered iPhone Showcase */}
+            <div className="relative w-36 h-56 -mr-1 shrink-0 flex items-center justify-center">
+              {/* Dynamic 3D Ambient Floor Shadow */}
+              <div className="absolute bottom-1 right-2 w-28 h-4 bg-emerald-950/40 blur-md rounded-full pointer-events-none" />
+
+              {/* Floating Discount Tag */}
+              <div className="absolute top-1 right-0 z-20 bg-zinc-950/85 backdrop-blur-md border border-white/20 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-lg pointer-events-none animate-floatSlow">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00DF82] animate-pulse" />
+                <span className="text-[9px] font-black text-white tracking-wider">UP TO 50% OFF</span>
+              </div>
+
+              {/* Secondary Layered 3D iPhone (Adds true 3D spatial depth) */}
+              <div className="absolute w-28 h-48 right-3 top-2 z-0 opacity-70 animate-floatLag pointer-events-none">
+                <Image
+                  src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=940&hei=1112&fmt=png-alpha"
+                  alt="iPhone 16 Pro Black Titanium"
+                  fill
+                  className="object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.85)] scale-95 rotate-[-4deg]"
+                />
+              </div>
+
+              {/* Primary 3D Hero iPhone (Natural Titanium with sculpted lenses & metallic rim) */}
+              <div className="relative w-36 h-56 z-10 animate-floatSlow">
+                <Image
+                  src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha"
+                  alt="iPhone 15 Pro Natural Titanium"
+                  fill
+                  priority
+                  className="object-contain drop-shadow-[0_24px_38px_rgba(0,0,0,0.92)] drop-shadow-[0_0_25px_rgba(0,223,130,0.25)] scale-110"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Hero Trust Badges (Row of 3 below Hero) */}
-          <div className="grid grid-cols-3 gap-1 pt-6 pb-2 text-center border-t border-zinc-800/80 mt-5">
-            <div className="flex flex-col items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-zinc-300 stroke-[1.8]" />
-              <span className="text-[10px] text-zinc-300 font-medium">100% Original</span>
+          {/* Hero Trust Badges (Upgraded 3 Sleek Glass Cards) */}
+          <div className="grid grid-cols-3 gap-2 pt-5 pb-1 relative z-10 border-t border-zinc-800/80 mt-4">
+            <div className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-md rounded-2xl py-2 px-1 flex flex-col items-center text-center shadow-xs">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-1 text-[#00DF82]">
+                <ShieldCheck className="w-3.5 h-3.5 stroke-[2.2]" />
+              </div>
+              <span className="text-[10px] text-white font-extrabold tracking-tight">100% Original</span>
+              <span className="text-[9px] text-zinc-400 font-medium">Apple Certified</span>
             </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-zinc-300 stroke-[1.8]" />
-              <span className="text-[10px] text-zinc-300 font-medium">Verified & Tested</span>
+
+            <div className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-md rounded-2xl py-2 px-1 flex flex-col items-center text-center shadow-xs">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-1 text-[#00DF82]">
+                <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.2]" />
+              </div>
+              <span className="text-[10px] text-white font-extrabold tracking-tight">Verified & Tested</span>
+              <span className="text-[9px] text-zinc-400 font-medium">48-Point Audit</span>
             </div>
-            <div className="flex flex-col items-center gap-1.5">
-              <Truck className="w-4 h-4 text-zinc-300 stroke-[1.8]" />
-              <span className="text-[10px] text-zinc-300 font-medium">Fast & Secure Delivery</span>
+
+            <div className="bg-white/[0.04] border border-white/[0.08] backdrop-blur-md rounded-2xl py-2 px-1 flex flex-col items-center text-center shadow-xs">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-1 text-[#00DF82]">
+                <Truck className="w-3.5 h-3.5 stroke-[2.2]" />
+              </div>
+              <span className="text-[10px] text-white font-extrabold tracking-tight">Fast Delivery</span>
+              <span className="text-[9px] text-zinc-400 font-medium">Free Doorstep</span>
             </div>
           </div>
         </section>
