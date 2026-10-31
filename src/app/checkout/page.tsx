@@ -8,12 +8,11 @@ import {
   ShieldCheck,
   CheckCircle2,
   Lock,
+  Truck,
+  Check,
+  Loader2,
   CreditCard,
   QrCode,
-  Truck,
-  ArrowRight,
-  ChevronRight,
-  Check,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useCart } from '../../context/CartContext';
@@ -55,8 +54,6 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, subtotal, appliedCoupon, clearCart } = useCart();
 
-  const [step, setStep] = useState<2 | 3>(2);
-
   // Shipping details
   const [fullName, setFullName] = useState('Rahul Yadav');
   const [phone, setPhone] = useState('+91 98765 43210');
@@ -66,7 +63,7 @@ export default function CheckoutPage() {
   const [state, setState] = useState('Karnataka');
   const [pinCode, setPinCode] = useState('560103');
 
-  // Payment details
+  // Payment method: Defaults to Razorpay Online (UPI/Card/Netbanking/EMI)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
   const [processing, setProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState<string | null>(null);
@@ -75,16 +72,19 @@ export default function CheckoutPage() {
   const shipping = 0;
   const finalTotal = Math.max(0, subtotal - discount + shipping);
 
-  const handleShippingSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePlaceOrder = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
     if (!fullName || !phone || !street || !pinCode) {
-      alert('Please fill out all required address fields.');
+      alert('Please fill out all required shipping address fields.');
       return;
     }
-    setStep(3);
-  };
 
-  const handlePlaceOrder = async () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty. Please add items before checking out.');
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      // 3. Complete order (COD or Mock Payment Flow)
+      // 3. Complete order (COD Flow)
       finishOrder(orderNumber);
     } catch (err) {
       console.error(err);
@@ -278,7 +278,7 @@ export default function CheckoutPage() {
           <div className="flex justify-between">
             <span className="text-zinc-500">Payment Status:</span>
             <span className="font-bold text-emerald-700">
-              {paymentMethod === 'COD' ? 'Cash on Delivery Verified' : 'Paid & Confirmed'}
+              {paymentMethod === 'COD' ? 'Cash on Delivery Verified' : 'Paid & Confirmed via Razorpay'}
             </span>
           </div>
           <div className="flex justify-between">
@@ -309,304 +309,221 @@ export default function CheckoutPage() {
     );
   }
 
+  if (cart.length === 0) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-5">
+        <div className="w-16 h-16 rounded-full bg-zinc-100 text-zinc-400 flex items-center justify-center mx-auto">
+          <Truck className="w-8 h-8" />
+        </div>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-zinc-900">Your bag is empty</h1>
+          <p className="text-xs text-zinc-500">Add an iPhone or certified accessory to your cart to proceed with checkout.</p>
+        </div>
+        <Link
+          href="/products"
+          className="inline-block px-6 py-3.5 bg-brand-black text-white text-xs font-bold rounded-2xl hover:bg-zinc-800 transition"
+        >
+          Explore iPhone Catalog
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       
-      {/* Checkout Progress Stepper */}
-      <div className="flex items-center justify-center gap-8 text-xs font-bold border-b border-zinc-200 pb-6">
-        <Link href="/cart" className="flex items-center gap-2 text-zinc-400 hover:text-zinc-700">
-          <Check className="w-4 h-4 text-brand-emerald" />
+      {/* Checkout Progress Stepper (2 Clean Steps) */}
+      <div className="flex items-center justify-center gap-6 sm:gap-8 text-xs font-bold border-b border-zinc-200 pb-6">
+        <Link href="/cart" className="flex items-center gap-2 text-zinc-400 hover:text-zinc-700 transition">
+          <span className="w-6 h-6 rounded-full bg-emerald-100 text-brand-emerald flex items-center justify-center text-[11px] font-bold">
+            <Check className="w-3.5 h-3.5" />
+          </span>
           <span>Cart</span>
         </Link>
         <div className="w-12 h-0.5 bg-brand-emerald" />
-        <div
-          className={`flex items-center gap-2 ${
-            step === 2 ? 'text-brand-emerald' : 'text-zinc-900 font-bold'
-          }`}
-        >
-          <span
-            className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] ${
-              step >= 2 ? 'bg-brand-emerald text-white' : 'bg-zinc-100 text-zinc-400'
-            }`}
-          >
+        <div className="flex items-center gap-2 text-brand-emerald">
+          <span className="w-6 h-6 rounded-full bg-brand-emerald text-white flex items-center justify-center text-[11px] font-bold">
             2
           </span>
-          <span>Shipping</span>
-        </div>
-        <div className={`w-12 h-0.5 ${step === 3 ? 'bg-brand-emerald' : 'bg-zinc-200'}`} />
-        <div
-          className={`flex items-center gap-2 ${
-            step === 3 ? 'text-brand-emerald' : 'text-zinc-400'
-          }`}
-        >
-          <span
-            className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] ${
-              step === 3 ? 'bg-brand-emerald text-white' : 'bg-zinc-100 text-zinc-400'
-            }`}
-          >
-            3
-          </span>
-          <span>Payment</span>
+          <span className="text-zinc-900 font-extrabold">Shipping & Payment</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: Forms */}
-        <div className="lg:col-span-7 space-y-6">
-          
-          {/* STEP 2: SHIPPING ADDRESS */}
-          {step === 2 && (
-            <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-8 space-y-6 shadow-subtle">
-              <h2 className="text-xl font-extrabold text-zinc-900">Shipping Address</h2>
+        {/* Left Column: Shipping & Direct Pay Form */}
+        <div className="lg:col-span-7">
+          <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-8 space-y-6 shadow-subtle">
+            <div>
+              <h2 className="text-xl font-extrabold text-zinc-900">Delivery & Payment</h2>
+              <p className="text-xs text-zinc-500 mt-1">
+                Enter your shipping address. You can complete payment directly via Razorpay (UPI, Cards, NetBanking, EMI) on submit.
+              </p>
+            </div>
 
-              <form onSubmit={handleShippingSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-600">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-600">Mobile Number</label>
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                    />
-                  </div>
-                </div>
-
+            <form onSubmit={handlePlaceOrder} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">Email Address (for invoices & tracking)</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">Street Address / Flat / Floor</label>
+                  <label className="text-xs font-bold text-zinc-600">Full Name</label>
                   <input
                     type="text"
                     required
-                    value={street}
-                    onChange={(e) => setStreet(e.target.value)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-600">City</label>
-                    <input
-                      type="text"
-                      required
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-600">State</label>
-                    <input
-                      type="text"
-                      required
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-zinc-600">PIN Code</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      value={pinCode}
-                      onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">Mobile Number (for delivery & SMS updates)</label>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
                 </div>
-
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
-                  >
-                    Proceed to Payment Options
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* STEP 3: PAYMENT METHOD */}
-          {step === 3 && (
-            <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-8 space-y-6 shadow-subtle">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-extrabold text-zinc-900">Choose Payment Method</h2>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="text-xs font-semibold text-zinc-500 hover:text-zinc-900 underline"
-                >
-                  Edit Address
-                </button>
               </div>
 
-              {/* Payment Option Cards */}
-              <div className="space-y-3">
-                
-                {/* UPI */}
-                <label
-                  onClick={() => setPaymentMethod('UPI')}
-                  className={`p-4 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
-                    paymentMethod === 'UPI'
-                      ? 'border-brand-black bg-zinc-50'
-                      : 'border-zinc-200 hover:border-zinc-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={paymentMethod === 'UPI'}
-                      onChange={() => setPaymentMethod('UPI')}
-                      className="w-4 h-4 accent-brand-black"
-                    />
-                    <div>
-                      <p className="font-bold text-xs sm:text-sm text-zinc-900">
-                        UPI (PhonePe, Google Pay, Paytm, BHIM)
-                      </p>
-                      <p className="text-[11px] text-zinc-500">Instant verification & fast dispatch</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold text-brand-emerald bg-emerald-50 px-2 py-0.5 rounded-full">
-                    Recommended
-                  </span>
-                </label>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-zinc-600">Email Address (for invoice & tracking link)</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                />
+              </div>
 
-                {/* Credit / Debit Card */}
-                <label
-                  onClick={() => setPaymentMethod('Card')}
-                  className={`p-4 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
-                    paymentMethod === 'Card'
-                      ? 'border-brand-black bg-zinc-50'
-                      : 'border-zinc-200 hover:border-zinc-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={paymentMethod === 'Card'}
-                      onChange={() => setPaymentMethod('Card')}
-                      className="w-4 h-4 accent-brand-black"
-                    />
-                    <div>
-                      <p className="font-bold text-xs sm:text-sm text-zinc-900">
-                        Credit / Debit Card
-                      </p>
-                      <p className="text-[11px] text-zinc-500">Visa, MasterCard, RuPay, Amex</p>
-                    </div>
-                  </div>
-                </label>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-zinc-600">Street Address / Flat / Building</label>
+                <input
+                  type="text"
+                  required
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                />
+              </div>
 
-                {/* No Cost EMI */}
-                <label
-                  onClick={() => setPaymentMethod('EMI')}
-                  className={`p-4 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
-                    paymentMethod === 'EMI'
-                      ? 'border-brand-black bg-zinc-50'
-                      : 'border-zinc-200 hover:border-zinc-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={paymentMethod === 'EMI'}
-                      onChange={() => setPaymentMethod('EMI')}
-                      className="w-4 h-4 accent-brand-black"
-                    />
-                    <div>
-                      <p className="font-bold text-xs sm:text-sm text-zinc-900">
-                        No-Cost EMI (via Razorpay)
-                      </p>
-                      <p className="text-[11px] text-zinc-500">Starts from ₹{Math.round(finalTotal / 12).toLocaleString('en-IN')}/mo</p>
-                    </div>
-                  </div>
-                </label>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">City</label>
+                  <input
+                    type="text"
+                    required
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">State</label>
+                  <input
+                    type="text"
+                    required
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">PIN Code</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={pinCode}
+                    onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+              </div>
 
-                {/* Cash on Delivery */}
-                <label
-                  onClick={() => setPaymentMethod('COD')}
-                  className={`p-4 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
-                    paymentMethod === 'COD'
-                      ? 'border-brand-black bg-zinc-50'
-                      : 'border-zinc-200 hover:border-zinc-300'
-                  }`}
-                >
+              {/* Optional Cash on Delivery Toggle */}
+              <div className="pt-2">
+                <label className="flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50/70 hover:bg-zinc-100/70 cursor-pointer transition">
                   <div className="flex items-center gap-3">
                     <input
-                      type="radio"
-                      name="paymentMethod"
+                      type="checkbox"
                       checked={paymentMethod === 'COD'}
-                      onChange={() => setPaymentMethod('COD')}
-                      className="w-4 h-4 accent-brand-black"
+                      onChange={(e) => setPaymentMethod(e.target.checked ? 'COD' : 'UPI')}
+                      className="w-4 h-4 rounded text-brand-black accent-brand-black"
                     />
                     <div>
-                      <p className="font-bold text-xs sm:text-sm text-zinc-900">
-                        Cash on Delivery
+                      <p className="text-xs font-bold text-zinc-900">
+                        Prefer Cash on Delivery (COD)
                       </p>
-                      <p className="text-[11px] text-zinc-500">Pay when you receive the product</p>
+                      <p className="text-[11px] text-zinc-500">
+                        Pay with cash or QR code when the package arrives at your doorstep
+                      </p>
                     </div>
                   </div>
+                  {paymentMethod === 'COD' && (
+                    <span className="text-[10px] font-extrabold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      COD Active
+                    </span>
+                  )}
                 </label>
-
               </div>
 
-              {/* Pay Now Button */}
-              <button
-                type="button"
-                onClick={handlePlaceOrder}
-                disabled={processing}
-                className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
-              >
-                {processing ? 'Processing Payment...' : `Pay ${formatPrice(finalTotal)}`}
-              </button>
+              {/* Direct Payment / Order Action Button */}
+              <div className="pt-3 space-y-3">
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+                >
+                  {processing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-brand-emerald" />
+                      <span>{paymentMethod === 'COD' ? 'Placing Order...' : 'Opening Secure Razorpay Gateway...'}</span>
+                    </>
+                  ) : paymentMethod === 'COD' ? (
+                    <>
+                      <Truck className="w-4 h-4 text-brand-emerald" />
+                      <span>Place Cash on Delivery Order • {formatPrice(finalTotal)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 text-brand-emerald" />
+                      <span>Pay {formatPrice(finalTotal)} with Razorpay</span>
+                    </>
+                  )}
+                </button>
 
-              <p className="text-center text-[11px] text-zinc-400 flex items-center justify-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-brand-emerald" /> 256-bit Encrypted & Razorpay Verified Payment
-              </p>
-            </div>
-          )}
-
+                {paymentMethod !== 'COD' ? (
+                  <div className="text-center space-y-1">
+                    <p className="text-[11px] font-semibold text-zinc-600 flex items-center justify-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-brand-emerald shrink-0" />
+                      Supports Google Pay, PhonePe, Paytm, Cards, NetBanking & EMI
+                    </p>
+                    <p className="text-[10px] text-zinc-400 flex items-center justify-center gap-1">
+                      <Lock className="w-3 h-3 text-zinc-400" />
+                      100% Secure 256-bit Encrypted Transaction
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-center text-[11px] text-zinc-500">
+                    Verify order details before submitting. An SMS confirmation will be sent to your phone.
+                  </p>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* Right Column: Mini Summary */}
+        {/* Right Column: Order Summary */}
         <div className="lg:col-span-5 space-y-4">
           <div className="bg-zinc-50 rounded-3xl border border-zinc-200/80 p-6 space-y-4">
-            <h3 className="font-bold text-base text-zinc-900">Items in Bag</h3>
+            <h3 className="font-bold text-base text-zinc-900">Order Summary</h3>
             <div className="space-y-3 divide-y divide-zinc-200/60 text-xs">
               {cart.map((i) => (
                 <div key={i.product._id} className="pt-2 flex items-center justify-between">
                   <div>
                     <p className="font-bold text-zinc-900">{i.product.title}</p>
-                    <p className="text-zinc-500">{i.product.storage} • Qty {i.quantity}</p>
+                    <p className="text-zinc-500">{i.product.storage} • {i.product.color} • Qty {i.quantity}</p>
                   </div>
                   <span className="font-bold text-zinc-900">
                     {formatPrice(i.product.price * i.quantity)}
@@ -627,13 +544,20 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between text-zinc-500">
-                <span>Express Delivery</span>
+                <span>Express Insured Shipping</span>
                 <span className="text-emerald-700 font-bold uppercase">Free</span>
               </div>
               <div className="border-t border-zinc-200 pt-2 flex justify-between font-bold text-sm text-zinc-950">
                 <span>Total Amount</span>
                 <span>{formatPrice(finalTotal)}</span>
               </div>
+            </div>
+
+            <div className="p-3 bg-white rounded-xl border border-zinc-200/70 text-[11px] text-zinc-500 space-y-1">
+              <p className="font-semibold text-zinc-800 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" /> 1-Year Warranty & 7-Day Replacement
+              </p>
+              <p>Every device passes our 45-point hardware check before dispatch.</p>
             </div>
           </div>
         </div>
