@@ -21,6 +21,7 @@ import { getProducts } from '../services/product.service';
 import ProductCard from '../components/products/ProductCard';
 import { formatPrice } from '../lib/utils';
 import PromoCarousel from '../components/home/PromoCarousel';
+import FaqAccordion from '../components/home/FaqAccordion';
 
 export const revalidate = 60;
 
@@ -911,22 +912,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <div
-                key={idx}
-                                                                        className="bg-zinc-50 rounded-2xl border border-zinc-200/80 p-5 sm:p-6 space-y-2"
-                                                                      >
-                                                                        <h3 className="font-bold text-sm sm:text-base text-zinc-900 flex items-center gap-2">
-                                                                          <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-                                                                          {faq.q}
-                                                                        </h3>
-                                                                        <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed pl-6">
-                                                                          {faq.a}
-                                                                        </p>
-                                                                      </div>
-                                                                    ))}
-          </div>
+          <FaqAccordion faqs={faqs} />
         </section>
 
       </div>
