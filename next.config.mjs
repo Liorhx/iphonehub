@@ -1,9 +1,3 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -35,13 +29,6 @@ const nextConfig = {
         hostname: 'lh3.googleusercontent.com',
       },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      '@': path.resolve(__dirname, 'src'),
-    };
-    return config;
   },
   // If deployed on Vercel and backend is hosted on Render, proxy all /api requests smoothly without CORS issues
   async rewrites() {

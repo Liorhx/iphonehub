@@ -112,7 +112,12 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>© {new Date().getFullYear()} iPhoneHub. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <p>© {new Date().getFullYear()} iPhoneHub. All rights reserved.</p>
+            <Link href="/admin/login" className="text-zinc-600 hover:text-zinc-400 transition-colors">
+              Admin Portal
+            </Link>
+          </div>
           <div className="flex items-center gap-1 text-zinc-400">
             <span>Made with</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />

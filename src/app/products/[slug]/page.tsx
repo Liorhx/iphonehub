@@ -18,6 +18,9 @@ import {
   Check,
   CreditCard,
   RotateCcw,
+  Video,
+  Play,
+  X,
 } from 'lucide-react';
 import { Product } from '../../../types';
 import { INITIAL_PRODUCTS } from '../../../data/mockProducts';
@@ -41,15 +44,32 @@ export default function ProductDetailPage({
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   useEffect(() => {
-    const found =
-      INITIAL_PRODUCTS.find((p) => p.slug === params.slug || p._id === params.slug || p.id === params.slug) ||
-      INITIAL_PRODUCTS[0];
-    setProduct(found);
-    if (found) {
-      setSelectedStorage(found.storage);
+    async function loadDynamicProduct() {
+      try {
+        const res = await fetch(`/api/products/${params.slug}`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setProduct(data.data);
+          setSelectedStorage(data.data.storage || '128GB');
+          return;
+        }
+      } catch (e) {
+        // Fallback to static catalogue
+      }
+
+      const found =
+        INITIAL_PRODUCTS.find((p) => p.slug === params.slug || p._id === params.slug || p.id === params.slug) ||
+        INITIAL_PRODUCTS[0];
+      setProduct(found);
+      if (found) {
+        setSelectedStorage(found.storage);
+      }
     }
+
+    loadDynamicProduct();
   }, [params.slug]);
 
   if (!product) {
@@ -163,6 +183,32 @@ export default function ProductDetailPage({
                   <Image src={img} alt="" fill className="object-contain p-1" />
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* Inspection Video Banner if available */}
+          {product.videoUrl && (
+            <div className="bg-gradient-to-r from-zinc-950 to-zinc-900 text-white rounded-3xl p-5 flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-brand-emerald/20 flex items-center justify-center text-brand-emerald">
+                  <Video className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-white">
+                    360° Physical Inspection Video
+                  </h4>
+                  <p className="text-[11px] text-zinc-400">
+                    Recorded under studio lighting with Cloudinary verification
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowVideoModal(true)}
+                className="bg-brand-emerald hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+              >
+                <Play className="w-3.5 h-3.5 fill-white" />
+                Watch Video
+              </button>
             </div>
           )}
 
@@ -414,6 +460,34 @@ export default function ProductDetailPage({
             ))}
           </div>
         </section>
+      )}
+
+      {/* Video Modal Lightbox */}
+      {showVideoModal && product.videoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-zinc-950 rounded-3xl max-w-xl w-full overflow-hidden border border-zinc-800 shadow-2xl relative">
+            <div className="p-4 flex items-center justify-between border-b border-zinc-800">
+              <span className="text-xs font-bold text-zinc-300 flex items-center gap-2">
+                <Video className="w-4 h-4 text-brand-emerald" />
+                Physical Inspection Video • {product.title}
+              </span>
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="text-zinc-400 hover:text-white font-bold p-1 text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="aspect-video w-full bg-black flex items-center justify-center">
+              <video
+                src={product.videoUrl}
+                controls
+                autoPlay
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

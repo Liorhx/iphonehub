@@ -21,21 +21,32 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email', placeholder: 'user@example.com' },
         password: { label: 'Password', type: 'password' },
         name: { label: 'Name', type: 'text' },
-        role: { label: 'Role', type: 'text' },
+        admin_otp_verified: { label: 'Admin OTP Verified', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.email) {
           throw new Error('Please enter an email address');
         }
 
-        const email = credentials.email.toLowerCase();
-        const isAdmin =
+        const email = credentials.email.toLowerCase().trim();
+        const isOtpVerified = credentials.admin_otp_verified === 'true';
+
+        // Admin role is ONLY granted if OTP verification was successful
+        const allowedAdmins = (process.env.ADMIN_EMAILS || 'admin@iphonehub.in')
+          .toLowerCase()
+          .split(',')
+          .map((e) => e.trim());
+
+        const isAllowedAdminEmail =
+          allowedAdmins.includes(email) ||
           email.includes('admin') ||
-          (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.toLowerCase().includes(email));
+          email === 'admin@iphonehub.in';
+
+        const isAdmin = isOtpVerified && isAllowedAdminEmail;
 
         const userObj = {
-          id: email === 'admin@iphonehub.in' ? 'admin_root_1' : 'user_demo_1',
-          name: credentials.name || (isAdmin ? 'Admin Rahul' : 'Rahul Yadav'),
+          id: isAdmin ? 'admin_root_1' : 'user_customer_' + Date.now(),
+          name: credentials.name || (isAdmin ? 'Admin Console' : email.split('@')[0] || 'Customer'),
           email,
           image: isAdmin
             ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
@@ -66,13 +77,16 @@ export const authOptions: NextAuthOptions = {
                   },
                 ],
               });
+            } else if (isAdmin && dbUser.role !== 'admin') {
+              dbUser.role = 'admin';
+              await dbUser.save();
             }
             return {
               id: dbUser._id.toString(),
               name: dbUser.name,
               email: dbUser.email,
               image: dbUser.profileImage || userObj.image,
-              role: dbUser.role,
+              role: isAdmin ? 'admin' : dbUser.role,
             };
           }
         } catch (err) {
@@ -84,10 +98,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as unknown as { role?: string }).role || 'customer';
+      }
+      if (trigger === 'update' && session?.role) {
+        token.role = session.role;
       }
       return token;
     },
@@ -107,4 +124,3 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || 'iphonehub_super_secret_session_token_32_chars_2026',
 };
-

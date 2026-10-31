@@ -15,6 +15,7 @@ export interface IProduct {
   originalPrice: number;
   images: string[];
   thumbnail: string;
+  videoUrl?: string;
   specifications: {
     display: string;
     processor: string;
@@ -56,6 +57,7 @@ const ProductSchema = new Schema(
     originalPrice: { type: Number, required: true },
     images: [{ type: String }],
     thumbnail: { type: String, required: true },
+    videoUrl: { type: String, default: '' },
     specifications: {
       display: { type: String, default: 'Super Retina XDR OLED' },
       processor: { type: String, default: 'Apple Bionic' },

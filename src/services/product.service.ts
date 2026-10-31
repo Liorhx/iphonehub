@@ -155,6 +155,7 @@ export async function createProduct(productData: Partial<Product>): Promise<Prod
       'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-black-select-202309?wid=940&hei=1112&fmt=png-alpha'
     ],
     thumbnail: productData.thumbnail || productData.images?.[0] || 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-black-select-202309?wid=940&hei=1112&fmt=png-alpha',
+    videoUrl: productData.videoUrl || '',
     specifications: productData.specifications || {
       display: 'Super Retina XDR OLED display',
       processor: 'Apple Bionic chip',
@@ -196,20 +197,30 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
   try {
     const conn = await connectToDatabase();
     if (conn) {
-      const updated = await ProductModel.findByIdAndUpdate(id, updates, { new: true }).lean();
+      const updated = await ProductModel.findOneAndUpdate(
+        { $or: [{ _id: id }, { slug: id }] },
+        { $set: updates },
+        { new: true }
+      ).lean();
       if (updated) {
-        return {
+        const mapped = {
           ...updated,
           _id: updated._id.toString(),
           id: updated._id.toString(),
         } as unknown as Product;
+
+        const idx = memoryProducts.findIndex((p) => p._id === id || p.id === id || p.slug === id);
+        if (idx !== -1) {
+          memoryProducts[idx] = { ...memoryProducts[idx], ...mapped };
+        }
+        return mapped;
       }
     }
   } catch (err) {
     console.warn('Updating in memory store:', err);
   }
 
-  const idx = memoryProducts.findIndex((p) => p._id === id || p.id === id);
+  const idx = memoryProducts.findIndex((p) => p._id === id || p.id === id || p.slug === id);
   if (idx !== -1) {
     memoryProducts[idx] = { ...memoryProducts[idx], ...updates };
     return memoryProducts[idx];
@@ -221,14 +232,13 @@ export async function deleteProduct(id: string): Promise<boolean> {
   try {
     const conn = await connectToDatabase();
     if (conn) {
-      await ProductModel.findByIdAndDelete(id);
-      return true;
+      await ProductModel.findOneAndDelete({ $or: [{ _id: id }, { slug: id }] });
     }
   } catch (err) {
     console.warn('Deleting in memory store:', err);
   }
 
-  memoryProducts = memoryProducts.filter((p) => p._id !== id && p.id !== id);
+  memoryProducts = memoryProducts.filter((p) => p._id !== id && p.id !== id && p.slug !== id);
   return true;
 }
 

@@ -35,7 +35,7 @@ export default function Navbar() {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const isAdmin = (session?.user as unknown as { role?: string })?.role === 'admin' || session?.user?.email?.includes('admin');
+  const isAdmin = (session?.user as unknown as { role?: string })?.role === 'admin';
 
   const navLinks = [
     { label: 'Buy iPhones', href: '/products' },
@@ -75,7 +75,7 @@ export default function Navbar() {
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              const isActive = pathname === link.href || (link.href !== '/' && Boolean(pathname?.startsWith(link.href)));
               return (
                 <Link
                   key={link.label}

@@ -33,6 +33,7 @@ export interface Product {
   originalPrice: number;
   images: string[];
   thumbnail: string;
+  videoUrl?: string;
   specifications: ProductSpecification;
   verificationChecks?: VerificationCheck[];
   warranty: string; // e.g. "6 Months iPhoneHub Warranty"

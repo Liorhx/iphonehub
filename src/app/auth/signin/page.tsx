@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
-import { Smartphone, Mail, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Smartphone, Mail, Lock, ArrowRight, UserCheck } from 'lucide-react';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -30,35 +30,24 @@ export default function SignInPage() {
       if (res?.error) {
         setError(res.error);
       } else {
-        window.location.href = email.includes('admin') ? '/admin' : '/account';
+        window.location.href = '/account';
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      setError('An unexpected error occurred during sign-in.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickDemoLogin = (role: 'customer' | 'admin') => {
-    if (role === 'admin') {
-      setEmail('admin@iphonehub.in');
-      setName('Admin Rahul');
-      signIn('credentials', {
-        callbackUrl: '/admin',
-        email: 'admin@iphonehub.in',
-        name: 'Admin Rahul',
-        password: 'adminpassword',
-      });
-    } else {
-      setEmail('rahul.demo@iphonehub.in');
-      setName('Rahul Yadav');
-      signIn('credentials', {
-        callbackUrl: '/account',
-        email: 'rahul.demo@iphonehub.in',
-        name: 'Rahul Yadav',
-        password: 'demopassword',
-      });
-    }
+  const handleQuickCustomerDemo = () => {
+    setEmail('customer.demo@iphonehub.in');
+    setName('Rahul Yadav');
+    signIn('credentials', {
+      callbackUrl: '/account',
+      email: 'customer.demo@iphonehub.in',
+      name: 'Rahul Yadav',
+      password: 'democustomerpass',
+    });
   };
 
   return (
@@ -73,7 +62,7 @@ export default function SignInPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-extrabold text-zinc-900 tracking-tight">
-            Welcome to iPhoneHub
+            Customer Sign In
           </h1>
           <p className="text-xs text-zinc-500">
             Sign in to track orders, manage trade-in valuations, and checkout faster.
@@ -152,34 +141,26 @@ export default function SignInPage() {
             disabled={loading}
             className="w-full py-3.5 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
           >
-            {loading ? 'Signing in...' : 'Sign In with Email'}
+            {loading ? 'Signing in...' : 'Sign In as Customer'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* One-click Demo Logins */}
+        {/* 1-Click Demo Login for Customers Only */}
         <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 space-y-2">
           <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-center">
-            Instant 1-Click Sandbox Logins
+            Instant Customer Demo
           </p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => handleQuickDemoLogin('customer')}
-              className="py-2 px-3 rounded-xl bg-white border border-zinc-200 hover:border-brand-emerald text-xs font-semibold text-zinc-800 transition-colors shadow-sm"
-            >
-              👤 Demo Customer
-            </button>
-            <button
-              onClick={() => handleQuickDemoLogin('admin')}
-              className="py-2 px-3 rounded-xl bg-purple-50 border border-purple-200 hover:bg-purple-100 text-xs font-bold text-purple-800 transition-colors shadow-sm"
-            >
-              ⚡ Admin Panel
-            </button>
-          </div>
+          <button
+            onClick={handleQuickCustomerDemo}
+            className="w-full py-2.5 px-3 rounded-xl bg-white border border-zinc-200 hover:border-brand-emerald text-xs font-semibold text-zinc-800 transition-colors shadow-sm flex items-center justify-center gap-2"
+          >
+            <UserCheck className="w-4 h-4 text-brand-emerald" />
+            👤 Continue as Demo Customer
+          </button>
         </div>
 
       </div>
     </div>
   );
 }
-
