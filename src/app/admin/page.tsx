@@ -364,7 +364,7 @@ export default function AdminDashboardPage() {
               Admin Access Required
             </h2>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              This operations area is protected. Please complete 2FA OTP verification via Google or your authorized admin credentials.
+              This operations area is protected. Please sign in with your authorized Google administrator account configured in ADMIN_EMAILS.
             </p>
           </div>
           <div className="space-y-3 pt-2">
@@ -373,7 +373,7 @@ export default function AdminDashboardPage() {
               className="w-full py-3.5 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2"
             >
               <Shield className="w-4 h-4 text-brand-emerald" />
-              Enter Admin 2FA Gateway
+              Sign in with Google Admin
             </Link>
             <Link
               href="/"

@@ -4,6 +4,15 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import connectToDatabase from '@/lib/mongodb';
 import UserModel from '@/models/User';
 
+function getAdminEmails(): string[] {
+  const envAdmins = (process.env.ADMIN_EMAILS || 'yadav962160@gmail.com,admin@iphonehub.in')
+    .toLowerCase()
+    .split(',')
+    .map((e) => e.trim())
+    .filter(Boolean);
+  return envAdmins;
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== 'mock_google_client_id'
@@ -21,7 +30,6 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email', placeholder: 'user@example.com' },
         password: { label: 'Password', type: 'password' },
         name: { label: 'Name', type: 'text' },
-        admin_otp_verified: { label: 'Admin OTP Verified', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.email) {
@@ -29,23 +37,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         const email = credentials.email.toLowerCase().trim();
-        const isOtpVerified = credentials.admin_otp_verified === 'true';
-
-        // Admin role is ONLY granted if OTP verification was successful
-        const allowedAdmins = (process.env.ADMIN_EMAILS || 'yadav962160@gmail.com,admin@iphonehub.in')
-          .toLowerCase()
-          .split(',')
-          .map((e) => e.trim());
-
-        const isAllowedAdminEmail =
-          allowedAdmins.includes(email) ||
-          email.includes('admin') ||
-          email === 'yadav962160@gmail.com';
-
-        const isAdmin = isOtpVerified && isAllowedAdminEmail;
+        const allowedAdmins = getAdminEmails();
+        const isAdmin = allowedAdmins.includes(email) || email === 'yadav962160@gmail.com';
 
         const userObj = {
-          id: isAdmin ? 'admin_root_1' : 'user_customer_' + Date.now(),
+          id: isAdmin ? 'admin_root_1' : 'user_' + Date.now(),
           name: credentials.name || (isAdmin ? 'Admin Console' : email.split('@')[0] || 'Customer'),
           email,
           image: isAdmin
@@ -64,18 +60,6 @@ export const authOptions: NextAuthOptions = {
                 email: userObj.email,
                 role: userObj.role,
                 profileImage: userObj.image,
-                addresses: [
-                  {
-                    fullName: userObj.name,
-                    phone: '+91 98765 43210',
-                    street: '402, Apex Signature Heights',
-                    apartment: 'Tower B, Flat 402',
-                    city: 'Bengaluru',
-                    state: 'Karnataka',
-                    pinCode: '560103',
-                    isDefault: true,
-                  },
-                ],
               });
             } else if (isAdmin && dbUser.role !== 'admin') {
               dbUser.role = 'admin';
@@ -98,11 +82,44 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (user?.email) {
+        const email = user.email.toLowerCase().trim();
+        const allowedAdmins = getAdminEmails();
+        const isAdmin = allowedAdmins.includes(email) || email === 'yadav962160@gmail.com';
+
+        try {
+          const conn = await connectToDatabase();
+          if (conn) {
+            let dbUser = await UserModel.findOne({ email });
+            if (!dbUser) {
+              await UserModel.create({
+                name: user.name || 'User',
+                email,
+                role: isAdmin ? 'admin' : 'customer',
+                profileImage: user.image || '',
+              });
+            } else if (isAdmin && dbUser.role !== 'admin') {
+              dbUser.role = 'admin';
+              await dbUser.save();
+            }
+          }
+        } catch (dbErr) {
+          console.warn('DB sync on signIn bypassed:', dbErr);
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as unknown as { role?: string }).role || 'customer';
       }
+      const userEmail = (token.email || user?.email || '').toLowerCase().trim();
+      const allowedAdmins = getAdminEmails();
+      const isAdmin = allowedAdmins.includes(userEmail) || userEmail === 'yadav962160@gmail.com';
+
+      token.role = isAdmin ? 'admin' : 'customer';
+
       if (trigger === 'update' && session?.role) {
         token.role = session.role;
       }
@@ -110,14 +127,21 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
+        const userEmail = (session.user.email || token.email || '').toLowerCase().trim();
+        const allowedAdmins = getAdminEmails();
+        const isAdmin =
+          allowedAdmins.includes(userEmail) ||
+          userEmail === 'yadav962160@gmail.com' ||
+          token.role === 'admin';
+
         (session.user as unknown as { id?: string; role?: string }).id = token.id as string;
-        (session.user as unknown as { role?: string }).role = (token.role as string) || 'customer';
+        (session.user as unknown as { role?: string }).role = isAdmin ? 'admin' : 'customer';
       }
       return session;
     },
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/admin/login',
   },
   session: {
     strategy: 'jwt',
