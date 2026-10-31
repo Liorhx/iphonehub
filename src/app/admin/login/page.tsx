@@ -11,20 +11,17 @@ import {
   CheckCircle2,
   RotateCw,
   Lock,
-  MailCheck,
 } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const [step, setStep] = useState<'request' | 'verify'>('request');
   const [targetEmail, setTargetEmail] = useState('');
-  const [maskedEmail, setMaskedEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  const [devCode, setDevCode] = useState<string | null>(null);
 
-  // Request 6-digit OTP sent to configured ADMIN_EMAILS
+  // Request 6-digit OTP sent to configured ADMIN_EMAILS in .env
   const handleRequestOtp = async () => {
     setLoading(true);
     setError('');
@@ -40,19 +37,15 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || 'Failed to dispatch admin verification OTP.');
+        setError(data.error || 'Failed to dispatch security code to administrator email.');
         return;
       }
 
-      setTargetEmail(data.targetEmail || 'Admin');
-      setMaskedEmail(data.maskedEmail || data.targetEmail || 'Registered Admin');
+      setTargetEmail(data.targetEmail || '');
       setStep('verify');
-      setSuccessMsg(`A 6-digit authorization code was sent to ${data.maskedEmail || data.targetEmail}`);
-      if (data.devOtp) {
-        setDevCode(data.devOtp);
-      }
+      setSuccessMsg('A 6-digit authorization code has been dispatched to the registered administrator email.');
     } catch (err: unknown) {
-      setError('Network error occurred while requesting OTP.');
+      setError('Network error occurred while requesting code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -62,7 +55,7 @@ export default function AdminLoginPage() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp || otp.length < 6) {
-      setError('Please enter the full 6-digit OTP.');
+      setError('Please enter the full 6-digit security code.');
       return;
     }
 
@@ -79,7 +72,7 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || 'Invalid or expired OTP. Access denied.');
+        setError(data.error || 'Invalid or expired code. Access denied.');
         return;
       }
 
@@ -147,14 +140,7 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        {/* Dev OTP helper pill for instant local test */}
-        {devCode && (
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 font-mono text-center">
-            🔐 <span className="font-bold">Security OTP:</span> <span className="underline font-black text-base tracking-widest text-zinc-900 ml-1">{devCode}</span>
-          </div>
-        )}
-
-        {/* STEP 1: Single-Click "Get Admin OTP" (No Google button, No Email input) */}
+        {/* STEP 1: Single-Click "Get Admin OTP" (No prefilled email, No Google button) */}
         {step === 'request' && (
           <div className="space-y-5">
             <div className="p-5 bg-zinc-50 rounded-2xl border border-zinc-200/80 text-center space-y-2">
@@ -163,7 +149,7 @@ export default function AdminLoginPage() {
                 <span>Authorized Administrator Access</span>
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed">
-                Click below to send a single-use 6-digit security code to the registered administrator email.
+                Click below to send a single-use 6-digit authorization code to the registered administrator email.
               </p>
             </div>
 
@@ -175,7 +161,7 @@ export default function AdminLoginPage() {
               {loading ? (
                 <>
                   <RotateCw className="w-4 h-4 animate-spin text-brand-emerald" />
-                  <span>Sending Security Code to Admin...</span>
+                  <span>Dispatching Code to Admin Email...</span>
                 </>
               ) : (
                 <>
@@ -194,17 +180,16 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        {/* STEP 2: 6-Digit OTP Verification Form */}
+        {/* STEP 2: 6-Digit OTP Verification Form (No prefilled email displayed) */}
         {step === 'verify' && (
           <form onSubmit={handleVerifyOtp} className="space-y-5">
-            <div className="text-center space-y-1.5 p-3.5 bg-emerald-50/60 rounded-2xl border border-emerald-200/60">
-              <p className="text-xs font-semibold text-zinc-600">
-                Security code dispatched to admin:
+            <div className="text-center space-y-1 p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/80">
+              <p className="text-xs font-semibold text-zinc-700">
+                Security code dispatched
               </p>
-              <div className="flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-brand-emeraldDark">
-                <MailCheck className="w-4 h-4 text-brand-emerald" />
-                <span>{maskedEmail || targetEmail}</span>
-              </div>
+              <p className="text-[11px] text-zinc-500">
+                Please check your administrator email inbox and enter the 6-digit code.
+              </p>
             </div>
 
             <div className="space-y-2">

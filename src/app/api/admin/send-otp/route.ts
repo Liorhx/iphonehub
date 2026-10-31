@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       .map((e) => e.trim())
       .filter(Boolean);
 
-    // Default target is the primary administrator from ADMIN_EMAILS
+    // Primary administrator email
     const primaryAdmin = allowedAdmins[0] || 'yadav962160@gmail.com';
 
     let targetEmail = primaryAdmin;
@@ -32,21 +32,14 @@ export async function POST(request: NextRequest) {
     const otp = generateOtp(targetEmail);
     const result = await sendOtpEmail(targetEmail, otp);
 
-    // Mask email for display in UI (e.g. ya****@gmail.com)
-    const [namePart, domainPart] = targetEmail.split('@');
-    const maskedEmail = namePart && domainPart
-      ? `${namePart.slice(0, 3)}****@${domainPart}`
-      : targetEmail;
-
-    console.log(`🔐 [ADMIN 2FA DISPATCH] Dispatched OTP code to admin address: ${targetEmail}`);
+    console.log(`🔐 [ADMIN 2FA DISPATCH] Security OTP dispatched for admin: ${targetEmail}`);
 
     return NextResponse.json({
       success: true,
-      message: `A 6-digit security code has been dispatched to ${targetEmail}`,
+      message: 'A 6-digit security code has been dispatched to the registered administrator email.',
       targetEmail,
-      maskedEmail,
-      // For instant debugging / demo display when SMTP is not configured
-      devOtp: process.env.NODE_ENV !== 'production' || result.simulated ? otp : undefined,
+      emailSent: result.success,
+      // No devOtp returned for production security
     });
   } catch (error: unknown) {
     console.error('Send admin OTP error:', error);
