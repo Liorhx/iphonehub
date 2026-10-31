@@ -14,11 +14,23 @@ import {
   Loader2,
   CreditCard,
   QrCode,
+  MapPin,
+  Home,
+  Briefcase,
+  Plus,
+  Pencil,
+  X,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useCart } from '../../context/CartContext';
 import { formatPrice } from '../../lib/utils';
 import { PaymentMethod } from '../../types';
+import {
+  SavedAddress,
+  getSavedAddresses,
+  addSavedAddress,
+  updateSavedAddress,
+} from '@/lib/addresses';
 
 declare global {
   interface Window {
@@ -65,13 +77,125 @@ export default function CheckoutPage() {
   const [state, setState] = useState('');
   const [pinCode, setPinCode] = useState('');
 
-  // Auto-fill logged-in customer info
+  // Saved addresses management
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<SavedAddress | null>(null);
+  const [showManualFields, setShowManualFields] = useState(false);
+
+  // Address Modal form states
+  const [modalType, setModalType] = useState<'Home' | 'Work' | 'Other'>('Home');
+  const [modalName, setModalName] = useState('');
+  const [modalPhone, setModalPhone] = useState('');
+  const [modalStreet, setModalStreet] = useState('');
+  const [modalCity, setModalCity] = useState('');
+  const [modalState, setModalState] = useState('Uttar Pradesh');
+  const [modalPin, setModalPin] = useState('');
+  const [modalIsDefault, setModalIsDefault] = useState(false);
+
+  const applyAddress = (addr: SavedAddress) => {
+    setSelectedAddressId(addr.id);
+    setFullName(addr.fullName);
+    setPhone(addr.phone);
+    setStreet(addr.street);
+    setCity(addr.city);
+    setState(addr.state);
+    setPinCode(addr.pinCode);
+  };
+
+  // Load saved addresses and pre-select default
+  useEffect(() => {
+    const list = getSavedAddresses();
+    setSavedAddresses(list);
+    if (list.length > 0) {
+      const def = list.find((a) => a.isDefault) || list[0];
+      applyAddress(def);
+    }
+
+    const handleAddressUpdate = () => {
+      const refreshed = getSavedAddresses();
+      setSavedAddresses(refreshed);
+    };
+
+    window.addEventListener('saved_addresses_updated', handleAddressUpdate);
+    return () => window.removeEventListener('saved_addresses_updated', handleAddressUpdate);
+  }, []);
+
+  // Auto-fill logged-in customer info if not yet filled
   useEffect(() => {
     if (session?.user) {
       if (session.user.name && !fullName) setFullName(session.user.name);
       if (session.user.email && !email) setEmail(session.user.email);
     }
-  }, [session]);
+  }, [session, fullName, email]);
+
+  const openAddNewModal = () => {
+    setEditingAddress(null);
+    setModalType('Home');
+    setModalName(fullName || session?.user?.name || 'Rahul Yadav');
+    setModalPhone(phone || '+91 90449 14653');
+    setModalStreet('');
+    setModalCity('Lucknow');
+    setModalState('Uttar Pradesh');
+    setModalPin('226010');
+    setModalIsDefault(savedAddresses.length === 0);
+    setShowAddressModal(true);
+  };
+
+  const openEditModal = (addr: SavedAddress, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setEditingAddress(addr);
+    setModalType(addr.type);
+    setModalName(addr.fullName);
+    setModalPhone(addr.phone);
+    setModalStreet(addr.street);
+    setModalCity(addr.city);
+    setModalState(addr.state);
+    setModalPin(addr.pinCode);
+    setModalIsDefault(addr.isDefault);
+    setShowAddressModal(true);
+  };
+
+  const handleSaveModalAddress = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalName || !modalPhone || !modalStreet || !modalCity || !modalPin) {
+      alert('Please fill out all address fields.');
+      return;
+    }
+
+    if (editingAddress) {
+      const updated = updateSavedAddress({
+        ...editingAddress,
+        type: modalType,
+        fullName: modalName.trim(),
+        phone: modalPhone.trim(),
+        street: modalStreet.trim(),
+        city: modalCity.trim(),
+        state: modalState.trim(),
+        pinCode: modalPin.trim(),
+        isDefault: modalIsDefault,
+      });
+      setSavedAddresses(updated);
+      const target = updated.find((a) => a.id === editingAddress.id);
+      if (target) applyAddress(target);
+    } else {
+      const updated = addSavedAddress({
+        type: modalType,
+        fullName: modalName.trim(),
+        phone: modalPhone.trim(),
+        street: modalStreet.trim(),
+        city: modalCity.trim(),
+        state: modalState.trim(),
+        pinCode: modalPin.trim(),
+        isDefault: modalIsDefault,
+      });
+      setSavedAddresses(updated);
+      const newlyAdded = updated[0];
+      if (newlyAdded) applyAddress(newlyAdded);
+    }
+    setShowAddressModal(false);
+  };
 
   // Payment method: Defaults to Razorpay Online (UPI/Card/Netbanking/EMI)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
@@ -365,40 +489,215 @@ export default function CheckoutPage() {
         <div className="lg:col-span-7">
           <div className="bg-white rounded-3xl border border-zinc-200/80 p-4 sm:p-8 space-y-5 sm:space-y-6 shadow-subtle">
             <div>
-              <h2 className="text-xl font-extrabold text-zinc-900">Delivery & Payment</h2>
-              <p className="text-xs text-zinc-500 mt-1">
-                Enter your shipping address. You can complete payment directly via Razorpay (UPI, Cards, NetBanking, EMI) on submit.
-              </p>
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-black text-zinc-950 tracking-tight flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-brand-emerald" />
+                    Delivery Address
+                  </h2>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    Select a delivery location or add a new one
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={openAddNewModal}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-all shadow-xs active:scale-95 shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add New</span>
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handlePlaceOrder} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter your full name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
+              {/* Selectable Saved Address Cards (Screen 7 UX) */}
+              {savedAddresses.length > 0 ? (
+                <div className="space-y-3">
+                  {savedAddresses.map((addr) => {
+                    const isSelected = selectedAddressId === addr.id;
+                    return (
+                      <div
+                        key={addr.id}
+                        onClick={() => applyAddress(addr)}
+                        className={`p-4 rounded-2xl border transition-all cursor-pointer text-left relative ${
+                          isSelected
+                            ? 'border-brand-emerald ring-2 ring-brand-emerald/25 bg-emerald-50/20 shadow-xs'
+                            : 'border-zinc-200/90 bg-white hover:border-zinc-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            {/* Custom Radio Button */}
+                            <div className="pt-0.5 shrink-0">
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                  isSelected
+                                    ? 'border-brand-emerald bg-brand-emerald'
+                                    : 'border-zinc-300 bg-white'
+                                }`}
+                              >
+                                {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                              </div>
+                            </div>
+
+                            {/* Address details */}
+                            <div className="space-y-1">
+                              <div className="flex items-center flex-wrap gap-2">
+                                <span className="font-extrabold text-sm text-zinc-950">
+                                  {addr.fullName}
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200/60 uppercase">
+                                  {addr.type === 'Home' ? (
+                                    <Home className="w-2.5 h-2.5" />
+                                  ) : addr.type === 'Work' ? (
+                                    <Briefcase className="w-2.5 h-2.5" />
+                                  ) : (
+                                    <MapPin className="w-2.5 h-2.5" />
+                                  )}
+                                  {addr.type}
+                                </span>
+                                {addr.isDefault && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                    Default
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-zinc-600 leading-relaxed">
+                                {addr.street}, {addr.city}, {addr.state} - {addr.pinCode}
+                              </p>
+                              <p className="text-xs font-semibold text-zinc-500">
+                                {addr.phone}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Quick Edit Action */}
+                          <button
+                            type="button"
+                            onClick={(e) => openEditModal(addr, e)}
+                            className="p-1.5 text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition shrink-0"
+                            title="Edit Address"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Edit</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">Mobile Number (for delivery & SMS updates)</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="10-digit mobile number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
+              ) : (
+                <div className="p-4 rounded-2xl bg-zinc-50 border border-dashed border-zinc-300 text-center space-y-2">
+                  <p className="text-xs text-zinc-500">No saved addresses found.</p>
+                  <button
+                    type="button"
+                    onClick={openAddNewModal}
+                    className="text-xs font-bold text-brand-emerald hover:underline"
+                  >
+                    + Add your delivery address
+                  </button>
                 </div>
+              )}
+
+              {/* Toggle manual form fields */}
+              <div className="pt-1 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setShowManualFields(!showManualFields)}
+                  className="text-xs font-semibold text-zinc-500 hover:text-zinc-800 underline transition"
+                >
+                  {showManualFields ? 'Hide manual address fields' : 'Edit details or enter manually'}
+                </button>
+                {selectedAddressId && (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    Address Selected
+                  </span>
+                )}
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-600">Email Address (for invoice & tracking link)</label>
+              {/* Collapsible Manual Input Fields */}
+              {showManualFields && (
+                <div className="p-4 bg-zinc-50/70 rounded-2xl border border-zinc-200 space-y-3 transition-all">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-zinc-600">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Recipient full name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-zinc-600">Mobile Number</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="10-digit phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-zinc-600">Street Address / House / Flat</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Flat, Building, Street, Area"
+                      value={street}
+                      onChange={(e) => setStreet(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-zinc-600">City</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="City"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-zinc-600">State</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="State"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-zinc-600">PIN Code</label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        placeholder="PIN Code"
+                        value={pinCode}
+                        onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ''))}
+                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Customer Email for Invoicing & Tracking */}
+              <div className="space-y-1 pt-1">
+                <label className="text-xs font-bold text-zinc-700">Email Address (for order receipt & BlueDart tracking)</label>
                 <input
                   type="email"
                   required
@@ -407,55 +706,6 @@ export default function CheckoutPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
                 />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-600">Street Address / Flat / Building</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Flat/House No, Building, Street, Area"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">City</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="City"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">State</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="State"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-600">PIN Code</label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    placeholder="PIN Code"
-                    value={pinCode}
-                    onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                  />
-                </div>
               </div>
 
               {/* Optional Cash on Delivery Toggle */}
@@ -581,6 +831,162 @@ export default function CheckoutPage() {
 
       </div>
 
+      {/* Add / Edit Delivery Address Modal in Checkout */}
+      {showAddressModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in-50">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+              <h3 className="font-extrabold text-lg text-zinc-950">
+                {editingAddress ? 'Edit Delivery Address' : 'Add New Delivery Address'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAddressModal(false)}
+                className="p-1 rounded-full text-zinc-400 hover:text-zinc-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveModalAddress} className="space-y-4">
+              {/* Type selector: Home / Work / Other */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-zinc-600">Address Type</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['Home', 'Work', 'Other'] as const).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setModalType(t)}
+                      className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                        modalType === t
+                          ? 'border-brand-emerald bg-emerald-50 text-emerald-800 ring-2 ring-brand-emerald/20'
+                          : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
+                      }`}
+                    >
+                      {t === 'Home' ? (
+                        <Home className="w-3.5 h-3.5" />
+                      ) : t === 'Work' ? (
+                        <Briefcase className="w-3.5 h-3.5" />
+                      ) : (
+                        <MapPin className="w-3.5 h-3.5" />
+                      )}
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Full Name & Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Recipient's Name"
+                    value={modalName}
+                    onChange={(e) => setModalName(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="10-digit mobile number"
+                    value={modalPhone}
+                    onChange={(e) => setModalPhone(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+              </div>
+
+              {/* Street Address */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-zinc-600">House / Flat / Street / Area</label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="House/Flat No, Building Name, Street, Area"
+                  value={modalStreet}
+                  onChange={(e) => setModalStreet(e.target.value)}
+                  className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald resize-none"
+                />
+              </div>
+
+              {/* City, State, PIN */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">City</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="City"
+                    value={modalCity}
+                    onChange={(e) => setModalCity(e.target.value)}
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">State</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="State"
+                    value={modalState}
+                    onChange={(e) => setModalState(e.target.value)}
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">PIN Code</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    placeholder="6 digits"
+                    value={modalPin}
+                    onChange={(e) => setModalPin(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
+              </div>
+
+              {/* Make Default Checkbox */}
+              <label className="flex items-center gap-2 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={modalIsDefault}
+                  onChange={(e) => setModalIsDefault(e.target.checked)}
+                  className="w-4 h-4 rounded text-brand-emerald accent-brand-emerald"
+                />
+                <span className="text-xs text-zinc-700 font-semibold">
+                  Make this my default delivery address
+                </span>
+              </label>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddressModal(false)}
+                  className="flex-1 py-3 text-xs font-bold border border-zinc-200 rounded-xl text-zinc-600 hover:bg-zinc-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 text-xs font-bold bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl shadow-xs transition"
+                >
+                  {editingAddress ? 'Save Changes' : 'Save & Select Address'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

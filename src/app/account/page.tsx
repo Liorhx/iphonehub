@@ -28,6 +28,7 @@ import {
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
+import SavedAddressesView from '@/components/account/SavedAddressesView';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -38,49 +39,20 @@ export default function AccountPage() {
   // Active modal/panel view: null (main menu) | 'wishlist' | 'addresses' | 'support' | 'settings'
   const [activeModal, setActiveModal] = useState<'wishlist' | 'addresses' | 'support' | 'settings' | null>(null);
 
-  // Saved Addresses State
-  const [addresses, setAddresses] = useState([
-    {
-      id: 'addr_1',
-      title: 'Home Address',
-      street: 'House 42, Gomti Nagar, Near Riverside Mall',
-      city: 'Lucknow',
-      state: 'Uttar Pradesh',
-      pinCode: '226010',
-      isDefault: true,
-    },
-  ]);
-  const [showAddAddress, setShowAddAddress] = useState(false);
-  const [newStreet, setNewStreet] = useState('');
-  const [newCity, setNewCity] = useState('');
-  const [newPinCode, setNewPinCode] = useState('');
-
   const isAdmin = (session?.user as unknown as { role?: string })?.role === 'admin';
-
-  const handleAddAddress = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStreet || !newCity || !newPinCode) return;
-    setAddresses([
-      ...addresses,
-      {
-        id: `addr_${Date.now()}`,
-        title: 'New Address',
-        street: newStreet,
-        city: newCity,
-        state: 'Uttar Pradesh',
-        pinCode: newPinCode,
-        isDefault: false,
-      },
-    ]);
-    setNewStreet('');
-    setNewCity('');
-    setNewPinCode('');
-    setShowAddAddress(false);
-  };
 
   const userName = session?.user?.name || 'Rahul Yadav';
   const userEmail = session?.user?.email || 'rahul@gmail.com';
   const userImage = session?.user?.image;
+
+  // Render Saved Addresses dedicated view when active
+  if (activeModal === 'addresses') {
+    return (
+      <div className="min-h-[85vh] bg-[#FBFBFC] py-4">
+        <SavedAddressesView onBack={() => setActiveModal(null)} />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6 sm:py-10 space-y-5 pb-28">
@@ -300,103 +272,7 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* =========================================================================
-          MODAL 2: SAVED ADDRESSES
-          ========================================================================= */}
-      {activeModal === 'addresses' && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-3xl p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-brand-emerald" />
-                <h3 className="font-extrabold text-lg text-zinc-950">Saved Delivery Addresses</h3>
-              </div>
-              <button
-                onClick={() => setActiveModal(null)}
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="space-y-3">
-              {addresses.map((addr) => (
-                <div
-                  key={addr.id}
-                  className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-1 relative"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-sm text-zinc-900">{addr.title}</span>
-                    {addr.isDefault && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        Default
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-600">{addr.street}</p>
-                  <p className="text-xs text-zinc-500">{addr.city}, {addr.state} - {addr.pinCode}</p>
-                </div>
-              ))}
-            </div>
-
-            {showAddAddress ? (
-              <form onSubmit={handleAddAddress} className="space-y-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-200">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-600">Add New Address</h4>
-                <input
-                  type="text"
-                  required
-                  placeholder="Street / Flat / Colony address"
-                  value={newStreet}
-                  onChange={(e) => setNewStreet(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-white border border-zinc-200 rounded-xl focus:outline-none"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    required
-                    placeholder="City"
-                    value={newCity}
-                    onChange={(e) => setNewCity(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-zinc-200 rounded-xl focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    placeholder="PIN Code"
-                    value={newPinCode}
-                    onChange={(e) => setNewPinCode(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-3 py-2 text-xs bg-white border border-zinc-200 rounded-xl focus:outline-none"
-                  />
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddAddress(false)}
-                    className="flex-1 py-2 text-xs font-bold border border-zinc-200 rounded-xl text-zinc-600"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 py-2 text-xs font-bold bg-brand-emerald text-white rounded-xl"
-                  >
-                    Save Address
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowAddAddress(true)}
-                className="w-full py-3 border-2 border-dashed border-zinc-300 hover:border-zinc-400 rounded-2xl text-xs font-bold text-zinc-600 flex items-center justify-center gap-1.5 transition"
-              >
-                <Plus className="w-4 h-4" /> Add Delivery Address
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* =========================================================================
           MODAL 3: SUPPORT TICKETS & 24/7 HELPDESK
