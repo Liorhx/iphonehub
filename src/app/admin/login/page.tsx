@@ -81,7 +81,7 @@ export default function AdminLoginPage() {
                 <span>Access Denied</span>
               </div>
               <p className="leading-relaxed">
-                The signed-in Google account (<strong>{session?.user?.email}</strong>) is not registered as an administrator in <code className="bg-rose-100 px-1 py-0.5 rounded font-mono">ADMIN_EMAILS</code>.
+                The signed-in Google account (<strong>{session?.user?.email}</strong>) is not registered as an administrator.
               </p>
             </div>
 
