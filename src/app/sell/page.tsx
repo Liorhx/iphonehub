@@ -20,6 +20,8 @@ import {
   CreditCard,
   MapPin,
   Truck,
+  Search,
+  X,
 } from 'lucide-react';
 import { SUPPORTED_TRADE_IN_MODELS, calculateTradeInQuote } from '../../lib/tradeInPricing';
 import { formatPrice } from '../../lib/utils';
@@ -29,8 +31,44 @@ export default function SellPage() {
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
 
   // Step 1: Device details
-  const [selectedModel, setSelectedModel] = useState('iPhone 13');
+  const [selectedModel, setSelectedModel] = useState('iPhone 15');
+  const [modelSearch, setModelSearch] = useState('');
+  const [selectedFamily, setSelectedFamily] = useState('All');
+
+  const currentModelSpec =
+    SUPPORTED_TRADE_IN_MODELS.find((m) => m.model === selectedModel) || SUPPORTED_TRADE_IN_MODELS[0];
   const [selectedStorage, setSelectedStorage] = useState('128GB');
+
+  const familyFilters = [
+    'All',
+    'iPhone 18',
+    'iPhone 17',
+    'iPhone 16',
+    'iPhone 15',
+    'iPhone 14',
+    'iPhone 13',
+    'iPhone 12',
+    'iPhone 11',
+    'iPhone SE',
+    'iPhone X',
+    'iPhone 8',
+    'iPhone 7',
+    'iPhone 6',
+  ];
+
+  const handleSelectModel = (modelName: string) => {
+    setSelectedModel(modelName);
+    const spec = SUPPORTED_TRADE_IN_MODELS.find((m) => m.model === modelName);
+    if (spec && !spec.storages.includes(selectedStorage)) {
+      setSelectedStorage(spec.storages[0]);
+    }
+  };
+
+  const filteredModels = SUPPORTED_TRADE_IN_MODELS.filter((item) => {
+    const matchesSearch = item.model.toLowerCase().includes(modelSearch.toLowerCase().trim());
+    const matchesFamily = selectedFamily === 'All' || item.family === selectedFamily;
+    return matchesSearch && matchesFamily;
+  });
 
   // Step 2: Condition & issues
   const [selectedCondition, setSelectedCondition] = useState<DeviceCondition>('Excellent');
@@ -194,48 +232,129 @@ export default function SellPage() {
           </div>
 
           <div className="space-y-6 max-w-xl mx-auto">
-            {/* Device Grid (Screen 4 in Mockup) */}
+            {/* Device Grid with Search and Family Filters */}
             <div className="space-y-3">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-600 block">
-                Select Your Device
-              </label>
-              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-                {[
-                  { model: 'iPhone 16', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=940&hei=1112&fmt=png-alpha' },
-                  { model: 'iPhone 15', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-blue-select-202309?wid=940&hei=1112&fmt=png-alpha' },
-                  { model: 'iPhone 14', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-blue-select-202209?wid=940&hei=1112&fmt=png-alpha' },
-                  { model: 'iPhone 13', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-blue-select?wid=940&hei=1112&fmt=png-alpha' },
-                  { model: 'iPhone 12', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-blue-select-2020?wid=940&hei=1112&fmt=png-alpha' },
-                  { model: 'iPhone 11', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-11-black-select-2019?wid=940&hei=1112&fmt=png-alpha' },
-                ].map((item) => (
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-600 block">
+                  Select Your Device ({filteredModels.length} Models)
+                </label>
+                {(selectedFamily !== 'All' || modelSearch) && (
                   <button
-                    key={item.model}
                     type="button"
-                    onClick={() => setSelectedModel(item.model)}
-                    className={`p-3 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between gap-1.5 ${
-                      selectedModel === item.model
-                        ? 'border-brand-emerald bg-emerald-50/50 shadow-xs'
-                        : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300'
+                    onClick={() => {
+                      setSelectedFamily('All');
+                      setModelSearch('');
+                    }}
+                    className="text-[11px] font-bold text-brand-emerald hover:underline"
+                  >
+                    Reset Filter
+                  </button>
+                )}
+              </div>
+
+              {/* Search input matching mockup Screen 4 */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search iPhone model (e.g. 18 Pro, 15, 11, 6s...)"
+                  value={modelSearch}
+                  onChange={(e) => setModelSearch(e.target.value)}
+                  className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:border-brand-emerald focus:bg-white transition-all text-zinc-900"
+                />
+                {modelSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setModelSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-600 rounded-full"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Series Filter Chips */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                {familyFilters.map((fam) => (
+                  <button
+                    key={fam}
+                    type="button"
+                    onClick={() => {
+                      setSelectedFamily(fam);
+                      setModelSearch('');
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all ${
+                      selectedFamily === fam
+                        ? 'bg-zinc-950 text-white shadow-xs'
+                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
                     }`}
                   >
-                    <div className="relative w-12 h-14 sm:w-14 sm:h-16">
-                      <Image src={item.img} alt={item.model} fill className="object-contain" />
-                    </div>
-                    <span className="text-[11px] sm:text-xs font-bold text-zinc-900 block truncate">
-                      {item.model}
-                    </span>
+                    {fam}
                   </button>
                 ))}
               </div>
+
+              {/* Grid of Devices */}
+              {filteredModels.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3 max-h-[340px] overflow-y-auto pr-1">
+                  {filteredModels.map((item) => {
+                    const isSelected = selectedModel === item.model;
+                    const minPrice = Object.values(item.basePrice)[0] || 0;
+                    return (
+                      <button
+                        key={item.model}
+                        type="button"
+                        onClick={() => handleSelectModel(item.model)}
+                        className={`p-2.5 sm:p-3 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between gap-1.5 ${
+                          isSelected
+                            ? 'border-brand-emerald bg-emerald-50/60 shadow-xs ring-1 ring-brand-emerald'
+                            : 'border-zinc-200/90 bg-zinc-50/50 hover:border-zinc-300 hover:bg-white'
+                        }`}
+                      >
+                        <div className="relative w-12 h-14 sm:w-14 sm:h-16">
+                          <Image src={item.image} alt={item.model} fill className="object-contain" />
+                        </div>
+                        <div className="w-full min-w-0">
+                          <span className="text-[11px] sm:text-xs font-bold text-zinc-900 block truncate">
+                            {item.model}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 font-medium block truncate mt-0.5">
+                            From ₹{minPrice.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-8 text-center bg-zinc-50 rounded-2xl border border-zinc-200 space-y-2">
+                  <p className="text-xs text-zinc-500">No iPhone found matching &ldquo;{modelSearch}&rdquo;</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModelSearch('');
+                      setSelectedFamily('All');
+                    }}
+                    className="text-xs font-bold text-brand-emerald hover:underline"
+                  >
+                    Show all models
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Storage Capacity */}
+            {/* Storage Capacity (Dynamic for selected model) */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-600">
-                Storage Capacity
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-600 block">
+                  Storage Capacity
+                </label>
+                <span className="text-[11px] font-semibold text-zinc-500">
+                  {selectedModel}
+                </span>
+              </div>
               <div className="grid grid-cols-4 gap-2">
-                {['64GB', '128GB', '256GB', '512GB'].map((st) => (
+                {currentModelSpec.storages.map((st) => (
                   <button
                     key={st}
                     type="button"
@@ -476,8 +595,8 @@ export default function SellPage() {
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
             <div className="relative w-12 h-16 shrink-0">
               <Image
-                src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-blue-select?wid=940&hei=1112&fmt=png-alpha"
-                alt="Selected device"
+                src={currentModelSpec.image}
+                alt={selectedModel}
                 fill
                 className="object-contain"
               />
