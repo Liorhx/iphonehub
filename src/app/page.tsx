@@ -264,7 +264,7 @@ export default async function HomePage() {
                   tagColor: 'bg-emerald-50 text-emerald-800 border-emerald-200/70',
                   price: 'From ₹58,999',
                   href: '/products?family=iPhone%2016',
-                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha',
+                  image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-teal-select-202409?wid=940&hei=1112&fmt=png-alpha',
                   delay: '0s',
                 },
                 {
@@ -307,7 +307,7 @@ export default async function HomePage() {
                 <Link
                   key={idx}
                   href={item.href}
-                  className="w-[136px] sm:w-[152px] shrink-0 snap-start bg-gradient-to-b from-white via-zinc-50/70 to-white rounded-3xl border border-zinc-200/90 p-3 pt-3.5 pb-3 flex flex-col items-center justify-between text-center shadow-xs hover:border-emerald-500/50 hover:shadow-card transition-all duration-300 group select-none active:scale-95"
+                  className="w-[136px] sm:w-[152px] shrink-0 snap-start bg-gradient-to-b from-white via-zinc-50/70 to-white rounded-3xl border border-zinc-200/90 p-3 pt-3.5 pb-3 flex flex-col items-center justify-between text-center shadow-sm hover:border-emerald-500/50 hover:shadow-card transition-all duration-300 group select-none active:scale-95"
                 >
                   {/* Category Pill Tag */}
                   <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${item.tagColor}`}>
@@ -315,19 +315,21 @@ export default async function HomePage() {
                   </span>
 
                   {/* Prominent Large 3D Device Image */}
-                  <div className="relative w-full h-32 flex items-center justify-center my-1.5">
+                  <div className="relative w-full h-[126px] flex items-center justify-center my-1.5">
                     {/* Soft floor shadow */}
-                    <div className="absolute bottom-1 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-xs pointer-events-none group-hover:scale-125 transition-transform duration-300" />
+                    <div className="absolute bottom-1 w-16 h-2.5 bg-zinc-300/40 rounded-full blur-[2px] pointer-events-none group-hover:scale-125 transition-transform duration-300" />
                     
                     {/* Phone Image with Gentle Floating Motion */}
                     <div
-                      className="relative w-24 h-30 drop-shadow-[0_12px_22px_rgba(0,0,0,0.15)] animate-subtleFloat group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-300"
+                      className="relative w-[96px] h-[112px] drop-shadow-[0_12px_22px_rgba(0,0,0,0.15)] animate-subtleFloat group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-300"
                       style={{ animationDelay: item.delay }}
                     >
                       <Image
                         src={item.image}
                         alt={item.series}
                         fill
+                        sizes="96px"
+                        priority={idx < 2}
                         className="object-contain"
                       />
                     </div>
