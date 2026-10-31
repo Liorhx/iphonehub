@@ -29,6 +29,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
 import SavedAddressesView from '@/components/account/SavedAddressesView';
+import SettingsView from '@/components/account/SettingsView';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -50,6 +51,15 @@ export default function AccountPage() {
     return (
       <div className="min-h-[85vh] bg-[#FBFBFC] py-4">
         <SavedAddressesView onBack={() => setActiveModal(null)} />
+      </div>
+    );
+  }
+
+  // Render Settings dedicated view matching user mockup when active
+  if (activeModal === 'settings') {
+    return (
+      <div className="min-h-[85vh] bg-[#FBFBFC] py-4 pb-24">
+        <SettingsView onBack={() => setActiveModal(null)} />
       </div>
     );
   }
@@ -348,54 +358,7 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* =========================================================================
-          MODAL 4: SETTINGS & PREFERENCES
-          ========================================================================= */}
-      {activeModal === 'settings' && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-              <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-zinc-900" />
-                <h3 className="font-extrabold text-lg text-zinc-950">Account Settings</h3>
-              </div>
-              <button
-                onClick={() => setActiveModal(null)}
-                className="p-1 rounded-full text-zinc-400 hover:text-zinc-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="space-y-3">
-              <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Logged-in Profile</span>
-                <p className="font-bold text-sm text-zinc-900">{userName}</p>
-                <p className="text-xs text-zinc-500">{userEmail}</p>
-              </div>
-
-              <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-xs text-zinc-900">Authentication</h4>
-                  <p className="text-[11px] text-zinc-500">Google Single Sign-On Verified</p>
-                </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                  Active
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => signOut({ callbackUrl: '/' })}
-                className="w-full py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Log Out of iPhoneHub</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );
