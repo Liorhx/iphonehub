@@ -27,6 +27,30 @@ declare global {
   }
 }
 
+const loadRazorpayScript = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window !== 'undefined' && window.Razorpay) {
+      return resolve(true);
+    }
+    const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(true));
+      existingScript.addEventListener('error', () => resolve(false));
+      // In case it already loaded
+      if (window.Razorpay) return resolve(true);
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => {
+      console.error('Failed to load Razorpay SDK from checkout.razorpay.com');
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, subtotal, appliedCoupon, clearCart } = useCart();
@@ -111,29 +135,60 @@ export default function CheckoutPage() {
 
       // 2. If Razorpay / Online Payment is selected
       if (paymentMethod !== 'COD') {
+        // Ensure Razorpay SDK is fully loaded in browser
+        const isLoaded = await loadRazorpayScript();
+        if (!isLoaded || !window.Razorpay) {
+          alert('Unable to load Razorpay payment gateway. Please check your internet connection or disable ad-blockers and try again.');
+          setProcessing(false);
+          return;
+        }
+
         const paymentRes = await fetch('/api/payment/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: finalTotal, receipt: orderNumber }),
         });
+
         const paymentJson = await paymentRes.json();
 
-        // Check if Razorpay JS SDK is loaded and non-mock keys exist
-        if (typeof window !== 'undefined' && window.Razorpay && !paymentJson.isMock) {
-          const options = {
-            key: paymentJson.key,
-            amount: paymentJson.amount,
-            currency: 'INR',
-            name: 'iPhoneHub India',
-            description: `Order ${orderNumber}`,
-            order_id: paymentJson.orderId,
-            handler: async function (response: {
-              razorpay_payment_id: string;
-              razorpay_order_id: string;
-              razorpay_signature: string;
-            }) {
+        if (!paymentRes.ok || !paymentJson.success) {
+          alert(`Unable to initialize payment gateway: ${paymentJson.error || 'Server error'}`);
+          setProcessing(false);
+          return;
+        }
+
+        // If server is explicitly running in mock fallback mode
+        if (paymentJson.isMock) {
+          console.warn('⚠️ Razorpay credentials not configured on server; proceeding in simulated order flow.');
+          finishOrder(orderNumber);
+          return;
+        }
+
+        const activeKey = paymentJson.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+        if (!activeKey) {
+          alert('Razorpay Key ID is missing. Please set NEXT_PUBLIC_RAZORPAY_KEY_ID in your environment settings.');
+          setProcessing(false);
+          return;
+        }
+
+        // Clean phone number (Razorpay requires 10 digits without spaces or symbols)
+        const cleanPhone = phone.replace(/[^0-9]/g, '').slice(-10);
+
+        const options = {
+          key: activeKey,
+          amount: paymentJson.amount,
+          currency: paymentJson.currency || 'INR',
+          name: 'iPhoneHub India',
+          description: `Order ${orderNumber}`,
+          order_id: paymentJson.orderId,
+          handler: async function (response: {
+            razorpay_payment_id: string;
+            razorpay_order_id: string;
+            razorpay_signature: string;
+          }) {
+            try {
               // Verify signature on backend
-              await fetch('/api/payment/verify', {
+              const verifyRes = await fetch('/api/payment/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -141,23 +196,46 @@ export default function CheckoutPage() {
                   orderNumber,
                 }),
               });
+              const verifyJson = await verifyRes.json();
+              if (!verifyJson.success) {
+                alert(`Payment verification notice: ${verifyJson.error || 'Signature check failed'}`);
+              }
               finishOrder(orderNumber);
+            } catch (vErr) {
+              console.error('Verification error:', vErr);
+              finishOrder(orderNumber);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setProcessing(false);
             },
-            prefill: {
-              name: fullName,
-              email,
-              contact: phone,
-            },
-            theme: {
-              color: '#0B0B0C',
-            },
-          };
+          },
+          prefill: {
+            name: fullName,
+            email,
+            contact: cleanPhone,
+          },
+          notes: {
+            orderNumber,
+          },
+          theme: {
+            color: '#0B0B0C',
+          },
+        };
 
-          const rzp = new window.Razorpay(options);
-          rzp.open();
+        const rzp = new window.Razorpay(options);
+        // Handle payment failure event from Razorpay modal
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rzp.on('payment.failed', function (resp: any) {
+          console.error('Razorpay payment failure:', resp.error);
+          alert(`Payment Failed: ${resp.error?.description || resp.error?.reason || 'Transaction declined'}`);
           setProcessing(false);
-          return;
-        }
+        });
+
+        rzp.open();
+        setProcessing(false);
+        return;
       }
 
       // 3. Complete order (COD or Mock Payment Flow)

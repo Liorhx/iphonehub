@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '../components/providers/AuthProvider';
 import { CartProvider } from '../context/CartContext';
@@ -35,10 +36,13 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
-        {/* Razorpay checkout script */}
-        <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       </head>
       <body className="min-h-screen flex flex-col bg-white text-brand-black antialiased">
+        {/* Official Razorpay Checkout Script */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
@@ -53,4 +57,3 @@ export default function RootLayout({
     </html>
   );
 }
-

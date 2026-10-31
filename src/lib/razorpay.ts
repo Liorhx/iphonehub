@@ -2,8 +2,18 @@ import crypto from 'crypto';
 import Razorpay from 'razorpay';
 
 export function getRazorpayClient(): Razorpay | null {
-  const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+  const key_id = (
+    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+    process.env.RAZORPAY_KEY_ID ||
+    process.env.RAZORPAY_KEY ||
+    ''
+  ).trim();
+
+  const key_secret = (
+    process.env.RAZORPAY_KEY_SECRET ||
+    process.env.RAZORPAY_SECRET ||
+    ''
+  ).trim();
 
   if (!key_id || !key_secret || key_id.includes('mockkey')) {
     return null;
@@ -20,7 +30,12 @@ export function verifyRazorpaySignature(
   paymentId: string,
   signature: string
 ): boolean {
-  const secret = process.env.RAZORPAY_KEY_SECRET;
+  const secret = (
+    process.env.RAZORPAY_KEY_SECRET ||
+    process.env.RAZORPAY_SECRET ||
+    ''
+  ).trim();
+
   if (!secret || secret.includes('mock')) {
     // Development / Mock mode auto-passes valid-looking test strings
     return true;
@@ -39,4 +54,3 @@ export function verifyRazorpaySignature(
     return false;
   }
 }
-
