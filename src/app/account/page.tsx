@@ -81,7 +81,7 @@ export default function AccountPage() {
           Customer Account
         </h1>
         <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-          Welcome back, {session?.user?.name || 'Rahul Yadav'} ({session?.user?.email || 'rahul.demo@iphonehub.in'})
+          Welcome back, {session?.user?.name || session?.user?.email || 'Valued Customer'}
         </p>
       </div>
 
@@ -332,19 +332,21 @@ export default function AccountPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <label className="text-zinc-500 font-bold uppercase">Name</label>
-                  <p className="font-bold text-sm text-zinc-900 mt-1">{session?.user?.name || 'Rahul Yadav'}</p>
+                  <p className="font-bold text-sm text-zinc-900 mt-1">{session?.user?.name || 'Customer'}</p>
                 </div>
                 <div>
                   <label className="text-zinc-500 font-bold uppercase">Email</label>
-                  <p className="font-bold text-sm text-zinc-900 mt-1">{session?.user?.email || 'rahul.demo@iphonehub.in'}</p>
+                  <p className="font-bold text-sm text-zinc-900 mt-1">{session?.user?.email || 'Not provided'}</p>
                 </div>
                 <div>
                   <label className="text-zinc-500 font-bold uppercase">Phone Number</label>
-                  <p className="font-bold text-sm text-zinc-900 mt-1">+91 98765 43210</p>
+                  <p className="font-bold text-sm text-zinc-900 mt-1">{orders[0]?.shippingAddress?.phone || 'Not added yet'}</p>
                 </div>
                 <div>
                   <label className="text-zinc-500 font-bold uppercase">Account Role</label>
-                  <p className="font-bold text-sm text-brand-emerald mt-1">Verified Customer</p>
+                  <p className="font-bold text-sm text-brand-emerald mt-1">
+                    {(session?.user as { role?: string })?.role === 'admin' ? 'Administrator' : 'Verified Customer'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -354,15 +356,23 @@ export default function AccountPage() {
           {activeTab === 'addresses' && (
             <div className="bg-white rounded-3xl border border-zinc-200/80 p-8 space-y-4">
               <h3 className="font-bold text-xl text-zinc-900">Saved Addresses</h3>
-              <div className="p-4 rounded-2xl border border-brand-emerald bg-emerald-50/20 text-xs space-y-1">
-                <span className="font-bold text-brand-emeraldDark bg-emerald-100 px-2 py-0.5 rounded-full text-[10px]">
-                  Default Delivery
-                </span>
-                <p className="font-bold text-sm text-zinc-900 pt-1">Rahul Yadav</p>
-                <p className="text-zinc-600">402, Apex Signature Heights, Outer Ring Road</p>
-                <p className="text-zinc-600">Bengaluru, Karnataka - 560103</p>
-                <p className="text-zinc-600">Mobile: +91 98765 43210</p>
-              </div>
+              {orders.length > 0 && orders[0].shippingAddress ? (
+                <div className="p-4 rounded-2xl border border-brand-emerald bg-emerald-50/20 text-xs space-y-1">
+                  <span className="font-bold text-brand-emeraldDark bg-emerald-100 px-2 py-0.5 rounded-full text-[10px]">
+                    Recent Delivery Address
+                  </span>
+                  <p className="font-bold text-sm text-zinc-900 pt-1">{orders[0].shippingAddress.fullName}</p>
+                  <p className="text-zinc-600">{orders[0].shippingAddress.street}</p>
+                  <p className="text-zinc-600">{orders[0].shippingAddress.city}, {orders[0].shippingAddress.state} - {orders[0].shippingAddress.pinCode}</p>
+                  <p className="text-zinc-600">Mobile: {orders[0].shippingAddress.phone}</p>
+                </div>
+              ) : (
+                <div className="bg-zinc-50 rounded-2xl p-8 text-center text-zinc-500 text-xs space-y-2">
+                  <MapPin className="w-8 h-8 text-zinc-300 mx-auto" />
+                  <p className="font-semibold text-zinc-700">No saved addresses</p>
+                  <p className="text-zinc-400">Delivery addresses entered during checkout will automatically appear here.</p>
+                </div>
+              )}
             </div>
           )}
 

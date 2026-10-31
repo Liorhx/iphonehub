@@ -45,14 +45,18 @@ export async function getProducts(filters?: {
       if (filters?.sortBy === 'price_desc') sortObj = { price: -1 };
       if (filters?.sortBy === 'rating') sortObj = { rating: -1 };
 
-      const dbProducts = await ProductModel.find(query).sort(sortObj).lean();
-      if (dbProducts && dbProducts.length > 0) {
-        return dbProducts.map((p) => ({
-          ...p,
-          _id: p._id.toString(),
-          id: p._id.toString(),
-        })) as unknown as Product[];
+      // Auto-populate initial catalog into MongoDB if empty
+      const totalCount = await ProductModel.countDocuments();
+      if (totalCount === 0 && INITIAL_PRODUCTS.length > 0) {
+        await ProductModel.insertMany(INITIAL_PRODUCTS);
       }
+
+      const dbProducts = await ProductModel.find(query).sort(sortObj).lean();
+      return (dbProducts || []).map((p) => ({
+        ...p,
+        _id: p._id.toString(),
+        id: p._id.toString(),
+      })) as unknown as Product[];
     }
   } catch (err) {
     console.warn('Falling back to memory store for products:', err);
@@ -115,7 +119,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
     const conn = await connectToDatabase();
     if (conn) {
-      const dbProduct = await ProductModel.findOne({ slug }).lean();
+      const dbProduct = await ProductModel.findOne({
+        $or: [{ slug }, { _id: slug }, { id: slug }],
+      }).lean();
       if (dbProduct) {
         return {
           ...dbProduct,
@@ -123,6 +129,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
           id: dbProduct._id.toString(),
         } as unknown as Product;
       }
+      return null;
     }
   } catch (err) {
     console.warn('Memory fallback for slug:', slug);

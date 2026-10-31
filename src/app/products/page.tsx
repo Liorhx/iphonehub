@@ -24,6 +24,22 @@ function ProductsContent() {
 
   const [sortBy, setSortBy] = useState<'price_asc' | 'price_desc' | 'rating' | 'newest'>('newest');
 
+  // Fetch live products from database catalog
+  useEffect(() => {
+    async function fetchLiveProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setProducts(json.data);
+        }
+      } catch (err) {
+        console.warn('Using catalogue cache:', err);
+      }
+    }
+    fetchLiveProducts();
+  }, []);
+
   // Handle URL params on initial load
   useEffect(() => {
     if (!searchParams) return;

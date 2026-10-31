@@ -34,7 +34,6 @@ import {
 } from 'lucide-react';
 import { formatPrice } from '../../lib/utils';
 import { Product, Order, TradeIn, OrderStatus } from '../../types';
-import { INITIAL_PRODUCTS } from '../../data/mockProducts';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -42,7 +41,7 @@ export default function AdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'orders' | 'tradeins'>('products');
   const [orders, setOrders] = useState<Order[]>([]);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [tradeIns, setTradeIns] = useState<TradeIn[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,9 +62,7 @@ export default function AdminDashboardPage() {
   const [newCondition, setNewCondition] = useState<'Flawless' | 'Excellent' | 'Good' | 'Fair'>('Excellent');
   const [newBattery, setNewBattery] = useState('92');
   const [newStock, setNewStock] = useState('5');
-  const [newImages, setNewImages] = useState<string[]>([
-    'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-finish-select-202409-6-1inch-blue?wid=940&hei=1112&fmt=png-alpha',
-  ]);
+  const [newImages, setNewImages] = useState<string[]>([]);
   const [newVideoUrl, setNewVideoUrl] = useState<string>('');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
@@ -100,9 +97,9 @@ export default function AdminDashboardPage() {
         const tiData = await tiRes.json();
         const prodData = await prodRes.json();
 
-        if (ordData.success) setOrders(ordData.data);
-        if (tiData.success) setTradeIns(tiData.data);
-        if (prodData.success && prodData.data?.length > 0) setProducts(prodData.data);
+        if (ordData.success && Array.isArray(ordData.data)) setOrders(ordData.data);
+        if (tiData.success && Array.isArray(tiData.data)) setTradeIns(tiData.data);
+        if (prodData.success && Array.isArray(prodData.data)) setProducts(prodData.data);
       } catch (e) {
         console.error('Error fetching admin data:', e);
       } finally {

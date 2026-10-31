@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -52,16 +53,25 @@ const loadRazorpayScript = (): Promise<boolean> => {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { cart, subtotal, appliedCoupon, clearCart } = useCart();
 
-  // Shipping details
-  const [fullName, setFullName] = useState('Rahul Yadav');
-  const [phone, setPhone] = useState('+91 98765 43210');
-  const [email, setEmail] = useState('rahul.demo@iphonehub.in');
-  const [street, setStreet] = useState('402, Apex Signature Heights, Outer Ring Road');
-  const [city, setCity] = useState('Bengaluru');
-  const [state, setState] = useState('Karnataka');
-  const [pinCode, setPinCode] = useState('560103');
+  // Dynamic shipping details (starts empty, auto-populates from user session if available)
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [pinCode, setPinCode] = useState('');
+
+  // Auto-fill logged-in customer info
+  useEffect(() => {
+    if (session?.user) {
+      if (session.user.name && !fullName) setFullName(session.user.name);
+      if (session.user.email && !email) setEmail(session.user.email);
+    }
+  }, [session]);
 
   // Payment method: Defaults to Razorpay Online (UPI/Card/Netbanking/EMI)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
@@ -90,10 +100,10 @@ export default function CheckoutPage() {
     try {
       // 1. Create order on backend with inventory & price validation
       const orderPayload = {
-        userId: 'user_demo_1',
-        customerName: fullName,
-        customerEmail: email,
-        customerPhone: phone,
+        userId: session?.user ? (session.user as { id?: string }).id || session.user.email || 'customer' : `guest_${Date.now()}`,
+        customerName: fullName.trim(),
+        customerEmail: email.trim(),
+        customerPhone: phone.trim(),
         items: cart.map((item) => ({
           productId: item.product._id,
           title: item.product.title,
@@ -106,12 +116,12 @@ export default function CheckoutPage() {
           warranty: item.selectedWarranty?.type || item.product.warranty,
         })),
         shippingAddress: {
-          fullName,
-          phone,
-          street,
-          city,
-          state,
-          pinCode,
+          fullName: fullName.trim(),
+          phone: phone.trim(),
+          street: street.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          pinCode: pinCode.trim(),
         },
         paymentMethod,
         couponCode: appliedCoupon?.code,
@@ -368,6 +378,7 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Enter your full name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
@@ -378,6 +389,7 @@ export default function CheckoutPage() {
                   <input
                     type="tel"
                     required
+                    placeholder="10-digit mobile number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
@@ -390,6 +402,7 @@ export default function CheckoutPage() {
                 <input
                   type="email"
                   required
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
@@ -401,28 +414,31 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   required
+                  placeholder="Flat/House No, Building, Street, Area"
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
                   className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
                 />
               </div>
 
-                              <div className="grid grid-cols-3 gap-3">
-                                <div className="space-y-1">
-                                  <label className="text-xs font-bold text-zinc-600">City</label>
-                                  <input
-                                    type="text"
-                                    required
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
-                                  />
-                                </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-zinc-600">City</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
+                  />
+                </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-zinc-600">State</label>
                   <input
                     type="text"
                     required
+                    placeholder="State"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"
@@ -434,6 +450,7 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     maxLength={6}
+                    placeholder="PIN Code"
                     value={pinCode}
                     onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ''))}
                     className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald"

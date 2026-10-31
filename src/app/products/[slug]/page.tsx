@@ -61,8 +61,7 @@ export default function ProductDetailPage({
       }
 
       const found =
-        INITIAL_PRODUCTS.find((p) => p.slug === params.slug || p._id === params.slug || p.id === params.slug) ||
-        INITIAL_PRODUCTS[0];
+        INITIAL_PRODUCTS.find((p) => p.slug === params.slug || p._id === params.slug || p.id === params.slug) || null;
       setProduct(found);
       if (found) {
         setSelectedStorage(found.storage);
@@ -74,8 +73,19 @@ export default function ProductDetailPage({
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-        <p className="text-zinc-500">Loading iPhone details...</p>
+      <div className="max-w-xl mx-auto px-4 py-24 text-center space-y-4">
+        <h1 className="text-2xl font-bold text-zinc-900">Device Not Found</h1>
+        <p className="text-xs text-zinc-500">
+          The requested device is currently unavailable or has been removed from inventory.
+        </p>
+        <div>
+          <Link
+            href="/products"
+            className="inline-block px-5 py-2.5 bg-brand-black text-white text-xs font-bold rounded-xl hover:bg-zinc-800 transition"
+          >
+            ← Back to iPhone Catalog
+          </Link>
+        </div>
       </div>
     );
   }

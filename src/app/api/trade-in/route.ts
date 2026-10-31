@@ -54,9 +54,9 @@ export async function POST(request: NextRequest) {
 
     const created = await createTradeIn({
       userId: userId || 'guest_seller',
-      customerName: customerName || 'Valued Seller',
-      customerEmail: customerEmail || 'seller@iphonehub.in',
-      customerPhone: customerPhone || '+91 98765 43210',
+      customerName: customerName || pickupAddress.fullName || 'Customer',
+      customerEmail: customerEmail || '',
+      customerPhone: customerPhone || pickupAddress.phone || '',
       deviceModel,
       storage: storage || '128 GB',
       condition: condition || 'Good',
