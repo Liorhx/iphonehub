@@ -62,11 +62,14 @@ export default function AccountPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Delivered':
-        return 'bg-emerald-100 text-brand-emeraldDark border border-emerald-200';
       case 'Shipped':
-        return 'bg-blue-100 text-blue-800 border border-blue-200';
+        return 'bg-[#EAFBF3] text-[#0A7A53] border border-[#C2F3DD]';
       case 'Processing':
-        return 'bg-amber-100 text-amber-800 border border-amber-200';
+      case 'Order Placed':
+      case 'Payment Confirmed':
+        return 'bg-[#FFF6E5] text-[#B4690E] border border-[#FDE5B5]';
+      case 'Cancelled':
+        return 'bg-[#FDE8E8] text-[#9B1C1C] border border-[#F8B4B4]';
       default:
         return 'bg-zinc-100 text-zinc-700 border border-zinc-200';
     }
@@ -219,78 +222,64 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {/* Orders List */}
-              <div className="space-y-4">
+              {/* Orders List matching reference design */}
+              <div className="space-y-3">
                 {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <div
-                      key={order._id}
-                      className="bg-white rounded-3xl border border-zinc-200/80 p-5 sm:p-6 space-y-4 hover:shadow-subtle transition-shadow"
-                    >
-                      {/* Order Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-100 text-xs">
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono font-bold text-zinc-900 text-sm">
+                  filteredOrders.map((order) => {
+                    const firstItem = order.items?.[0];
+                    const totalItems = order.items?.reduce((sum, item) => sum + item.quantity, 0) || 1;
+
+                    return (
+                      <div
+                        key={order._id}
+                        onClick={() => setSelectedOrderForTracking(order)}
+                        className="bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-3.5 sm:p-5 flex items-center justify-between gap-3 hover:border-zinc-300 hover:shadow-subtle transition-all cursor-pointer group"
+                      >
+                        {/* Left Device Thumbnail */}
+                        <div className="relative w-16 h-20 bg-zinc-50 rounded-2xl border border-zinc-200/60 p-1.5 shrink-0 flex items-center justify-center">
+                          <Image
+                            src={
+                              firstItem?.image ||
+                              'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-naturaltitanium-select?wid=940&hei=1112&fmt=png-alpha'
+                            }
+                            alt={firstItem?.title || 'iPhone'}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+
+                        {/* Middle Info */}
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <h3 className="font-extrabold text-sm sm:text-base text-zinc-950 truncate tracking-tight">
                             #{order.orderNumber}
-                          </span>
-                          <span className="text-zinc-400">•</span>
-                          <span className="text-zinc-500 font-medium">
+                          </h3>
+                          <p className="text-xs text-zinc-400 font-medium">
                             {new Date(order.createdAt).toLocaleDateString('en-IN', {
                               day: 'numeric',
                               month: 'short',
                               year: 'numeric',
-                            })}
-                          </span>
+                            })}{' '}
+                            • {totalItems} {totalItems === 1 ? 'item' : 'items'}
+                          </p>
+                          <p className="font-extrabold text-sm sm:text-base text-zinc-950 pt-0.5">
+                            {formatPrice(order.total)}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-3">
+
+                        {/* Right Status Badge & Arrow */}
+                        <div className="flex flex-col items-end justify-between self-stretch shrink-0 py-0.5">
                           <span
-                            className={`px-3 py-1 rounded-full text-[11px] font-bold ${getStatusBadge(
+                            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${getStatusBadge(
                               order.orderStatus
                             )}`}
                           >
                             {order.orderStatus}
                           </span>
-                          <button
-                            onClick={() => setSelectedOrderForTracking(order)}
-                            className="text-xs font-bold text-brand-emerald hover:underline flex items-center gap-1"
-                          >
-                            View Details / Track →
-                          </button>
+                          <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                         </div>
                       </div>
-
-                      {/* Items */}
-                      <div className="space-y-3">
-                        {order.items.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-4">
-                            <div className="relative w-16 h-16 bg-zinc-50 rounded-xl p-1.5 shrink-0 border border-zinc-100">
-                              <Image src={item.image} alt={item.title} fill className="object-contain" />
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="font-bold text-sm text-zinc-900">{item.title}</h4>
-                              <p className="text-xs text-zinc-500">
-                                {item.storage} • {item.condition} • Qty {item.quantity}
-                              </p>
-                            </div>
-                            <span className="font-extrabold text-sm text-zinc-950">
-                              {formatPrice(item.price * item.quantity)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Order Footer */}
-                      <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-600">
-                        <span>Paid via {order.paymentMethod} • Shipping: {order.shippingAddress.city}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-zinc-400">Total Paid:</span>
-                          <span className="font-black text-sm text-zinc-950">
-                            {formatPrice(order.total)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="bg-zinc-50 rounded-3xl p-12 text-center text-zinc-500 text-sm">
                     No orders found in &quot;{orderFilter}&quot; status.

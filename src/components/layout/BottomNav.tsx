@@ -26,7 +26,7 @@ function BottomNavContent() {
   const isHomeActive = pathname === '/';
   const isBuyActive = pathname?.startsWith('/products');
   const isSellActive = pathname?.startsWith('/sell');
-  const isOrdersActive = pathname === '/account' && activeTabParam === 'orders';
+  const isOrdersActive = Boolean(pathname?.startsWith('/orders') || (pathname === '/account' && activeTabParam === 'orders'));
   const isAccountActive = pathname === '/account' && activeTabParam !== 'orders';
 
   const navItems = [
@@ -50,7 +50,7 @@ function BottomNavContent() {
     },
     {
       label: 'Orders',
-      href: '/account?tab=orders',
+      href: '/orders',
       icon: Package,
       isActive: isOrdersActive,
     },
