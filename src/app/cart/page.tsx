@@ -15,6 +15,7 @@ import {
   Check,
   Truck,
   RotateCcw,
+  Loader2,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { formatPrice } from '../../lib/utils';
@@ -34,6 +35,7 @@ export default function CartPage() {
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const discount = appliedCoupon ? appliedCoupon.discount : 0;
   const shipping = 0; // Free pan-India express
@@ -285,31 +287,57 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* Continue to Payment CTA */}
+            {/* Continue to Payment CTA (Desktop only - hidden on mobile to prevent duplicate button) */}
             <button
-              onClick={() => router.push('/checkout')}
-              className="w-full py-4 bg-brand-emerald hover:bg-emerald-600 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+              onClick={() => {
+                setIsCheckingOut(true);
+                router.push('/checkout');
+              }}
+              disabled={isCheckingOut}
+              className="hidden md:flex w-full py-4 bg-brand-emerald hover:bg-emerald-600 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] items-center justify-center gap-2 disabled:opacity-80"
             >
-              Proceed to Checkout
-              <ArrowRight className="w-4 h-4" />
+              {isCheckingOut ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Proceeding to Checkout...
+                </>
+              ) : (
+                <>
+                  Proceed to Checkout
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </div>
 
       </div>
 
-      {/* Mobile Sticky Checkout Bar (Screen 6 in Mockup) */}
+      {/* Mobile Sticky Checkout Bar (Mobile only - single button) */}
       <div className="md:hidden fixed bottom-14 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-zinc-200/90 p-3 shadow-lg flex items-center justify-between gap-4">
         <div>
           <span className="text-[10px] text-zinc-500 font-semibold block uppercase">Total Amount</span>
           <span className="text-lg font-black text-zinc-950 block -mt-0.5">{formatPrice(finalTotal)}</span>
         </div>
         <button
-          onClick={() => router.push('/checkout')}
-          className="flex-1 py-3 px-5 bg-brand-emerald hover:bg-emerald-600 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95"
+          onClick={() => {
+            setIsCheckingOut(true);
+            router.push('/checkout');
+          }}
+          disabled={isCheckingOut}
+          className="flex-1 py-3 px-5 bg-brand-emerald hover:bg-emerald-600 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 disabled:opacity-80"
         >
-          Proceed to Checkout
-          <ArrowRight className="w-3.5 h-3.5" />
+          {isCheckingOut ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading...
+            </>
+          ) : (
+            <>
+              Proceed to Checkout
+              <ArrowRight className="w-3.5 h-3.5" />
+            </>
+          )}
         </button>
       </div>
 

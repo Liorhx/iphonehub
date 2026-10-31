@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Heart, BatteryCharging, Shield, Check, ShoppingBag } from 'lucide-react';
+import { Heart, BatteryCharging, Shield, Check, ShoppingBag, Loader2 } from 'lucide-react';
 import { Product } from '@/types';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
@@ -17,6 +17,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
   const discount = calculateDiscount(product.originalPrice, product.price);
@@ -25,9 +26,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsAdding(true);
     addToCart(product);
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1800);
+    setTimeout(() => {
+      setIsAdding(false);
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1800);
+    }, 200);
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -136,14 +141,18 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Add to Cart button (Full-width sleek mobile button as seen in mockup) */}
         <button
           onClick={handleAddToCart}
-          disabled={isAdded}
+          disabled={isAdded || isAdding}
           className={`w-full py-2 sm:py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-xs ${
             isAdded
               ? 'bg-zinc-900 text-white shadow-sm'
               : 'bg-brand-emerald hover:bg-emerald-600 text-white active:scale-98'
           }`}
         >
-          {isAdded ? (
+          {isAdding ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Adding...
+            </>
+          ) : isAdded ? (
             <>
               <Check className="w-3.5 h-3.5" /> Added
             </>
