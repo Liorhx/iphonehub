@@ -87,23 +87,35 @@ export async function sendOtpEmail(
 ): Promise<{ success: boolean; simulated?: boolean; message?: string }> {
   const normalizedEmail = toEmail.trim().toLowerCase();
 
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
+  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+  const smtpHost = process.env.SMTP_HOST || (smtpUser?.includes('@gmail.com') ? 'smtp.gmail.com' : undefined);
+  const smtpPort = process.env.SMTP_PORT
+    ? parseInt(process.env.SMTP_PORT, 10)
+    : smtpHost === 'smtp.gmail.com'
+    ? 465
+    : 587;
 
-  // If SMTP is configured with real credentials
-  if (smtpHost && smtpUser && smtpPass && !smtpHost.includes('mock')) {
+  // If SMTP / Gmail credentials are configured
+  if (smtpUser && smtpPass && !smtpPass.includes('mock')) {
     try {
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
+      const transporter = smtpHost
+        ? nodemailer.createTransport({
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpPort === 465,
+            auth: {
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          })
+        : nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          });
 
       const htmlContent = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 32px; background: #ffffff; border-radius: 20px; border: 1px solid #e5e7eb;">

@@ -32,7 +32,7 @@ export const authOptions: NextAuthOptions = {
         const isOtpVerified = credentials.admin_otp_verified === 'true';
 
         // Admin role is ONLY granted if OTP verification was successful
-        const allowedAdmins = (process.env.ADMIN_EMAILS || 'admin@iphonehub.in')
+        const allowedAdmins = (process.env.ADMIN_EMAILS || 'yadav962160@gmail.com,admin@iphonehub.in')
           .toLowerCase()
           .split(',')
           .map((e) => e.trim());
@@ -40,6 +40,7 @@ export const authOptions: NextAuthOptions = {
         const isAllowedAdminEmail =
           allowedAdmins.includes(email) ||
           email.includes('admin') ||
+          email === 'yadav962160@gmail.com' ||
           email === 'admin@iphonehub.in';
 
         const isAdmin = isOtpVerified && isAllowedAdminEmail;
