@@ -19,6 +19,7 @@ import {
   Building,
   CreditCard,
   MapPin,
+  Truck,
 } from 'lucide-react';
 import { SUPPORTED_TRADE_IN_MODELS, calculateTradeInQuote } from '../../lib/tradeInPricing';
 import { formatPrice } from '../../lib/utils';
@@ -193,22 +194,39 @@ export default function SellPage() {
           </div>
 
           <div className="space-y-6 max-w-xl mx-auto">
-            {/* Select iPhone Model */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-600">
-                Select iPhone Model
+            {/* Device Grid (Screen 4 in Mockup) */}
+            <div className="space-y-3">
+              <label className="text-xs font-bold uppercase tracking-wider text-zinc-600 block">
+                Select Your Device
               </label>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-semibold text-zinc-900 focus:outline-none focus:border-brand-emerald"
-              >
-                {SUPPORTED_TRADE_IN_MODELS.map((m) => (
-                  <option key={m.model} value={m.model}>
-                    {m.model}
-                  </option>
+              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                {[
+                  { model: 'iPhone 16', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=940&hei=1112&fmt=png-alpha' },
+                  { model: 'iPhone 15', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-blue-select-202309?wid=940&hei=1112&fmt=png-alpha' },
+                  { model: 'iPhone 14', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-blue-select-202209?wid=940&hei=1112&fmt=png-alpha' },
+                  { model: 'iPhone 13', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-blue-select?wid=940&hei=1112&fmt=png-alpha' },
+                  { model: 'iPhone 12', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-blue-select-2020?wid=940&hei=1112&fmt=png-alpha' },
+                  { model: 'iPhone 11', img: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-11-black-select-2019?wid=940&hei=1112&fmt=png-alpha' },
+                ].map((item) => (
+                  <button
+                    key={item.model}
+                    type="button"
+                    onClick={() => setSelectedModel(item.model)}
+                    className={`p-3 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-between gap-1.5 ${
+                      selectedModel === item.model
+                        ? 'border-brand-emerald bg-emerald-50/50 shadow-xs'
+                        : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300'
+                    }`}
+                  >
+                    <div className="relative w-12 h-14 sm:w-14 sm:h-16">
+                      <Image src={item.img} alt={item.model} fill className="object-contain" />
+                    </div>
+                    <span className="text-[11px] sm:text-xs font-bold text-zinc-900 block truncate">
+                      {item.model}
+                    </span>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Storage Capacity */}
@@ -224,7 +242,7 @@ export default function SellPage() {
                     onClick={() => setSelectedStorage(st)}
                     className={`py-3 rounded-2xl text-xs font-bold border transition-all ${
                       selectedStorage === st
-                        ? 'bg-brand-black text-white border-brand-black shadow-sm'
+                        ? 'bg-zinc-950 text-white border-zinc-950 shadow-xs'
                         : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:border-zinc-300'
                     }`}
                   >
@@ -235,13 +253,13 @@ export default function SellPage() {
             </div>
 
             {/* Next Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
+                className="w-full py-4 bg-brand-emerald hover:bg-emerald-600 text-white rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.99] shadow-md"
               >
-                Continue to Condition
+                Next
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -426,25 +444,37 @@ export default function SellPage() {
         </motion.div>
       )}
 
-      {/* STEP 3: QUOTE BREAKDOWN (Matches exact design from uploaded screenshot!) */}
+      {/* STEP 3: QUOTE BREAKDOWN (Matching Screen 5 in User Mockup!) */}
       {step === 3 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-10 space-y-8 shadow-subtle"
+          className="bg-white rounded-3xl border border-zinc-200/80 p-4 sm:p-8 space-y-6 shadow-subtle max-w-xl mx-auto"
         >
-          <div className="text-center max-w-lg mx-auto space-y-1">
-            <span className="bg-emerald-100 text-brand-emeraldDark text-[11px] font-bold px-3 py-1 rounded-full uppercase">
-              Instant Valuation Generated
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
-              Your Quote
-            </h2>
+          {/* Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setStep(2)}
+                className="p-1 rounded-lg hover:bg-zinc-100 text-zinc-600"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <h2 className="text-xl sm:text-2xl font-black text-zinc-900 tracking-tight">
+                Your Quote
+              </h2>
+            </div>
+            <button
+              onClick={() => setStep(1)}
+              className="text-xs font-bold text-brand-emerald hover:underline"
+            >
+              Change
+            </button>
           </div>
 
-          {/* Quote Card (Clean, modern, inspired by screenshot) */}
-          <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-6 sm:p-8 max-w-lg mx-auto text-center space-y-4">
-            <div className="relative w-28 h-28 mx-auto">
+          {/* Selected Device Preview Card */}
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
+            <div className="relative w-12 h-16 shrink-0">
               <Image
                 src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-blue-select?wid=940&hei=1112&fmt=png-alpha"
                 alt="Selected device"
@@ -452,71 +482,100 @@ export default function SellPage() {
                 className="object-contain"
               />
             </div>
-
-            <div>
-              <h3 className="font-bold text-lg text-zinc-900">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-extrabold text-sm text-zinc-900 truncate">
                 {selectedModel} ({selectedStorage})
               </h3>
-              <p className="text-xs text-zinc-500 font-medium">
-                Condition: {selectedCondition}
+              <p className="text-xs text-zinc-500 font-medium mt-0.5">
+                {selectedCondition} Condition
               </p>
             </div>
-
-            <div className="py-2">
-              <p className="text-4xl font-black text-zinc-950 tracking-tight">
-                {formatPrice(quote.estimatedQuote)}
-              </p>
-              <div className="mt-2 inline-flex items-center gap-1.5 bg-emerald-50 text-brand-emeraldDark border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>+ ₹{quote.exchangeBonus.toLocaleString('en-IN')} Exchange Bonus included</span>
-              </div>
-            </div>
-
-            <div className="text-xs text-zinc-500 bg-white p-3.5 rounded-2xl border border-zinc-200 space-y-1 text-left">
-              <p className="font-semibold text-zinc-800">Doorstep Handover Guarantee:</p>
-              <p>
-                Estimated price is finalized upon swift 5-minute technician inspection at your doorstep. Zero hidden deductions. Instant bank/UPI transfer.
-              </p>
-            </div>
-
-            <button
-              onClick={handleProceedToPickup}
-              className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
-            >
-              Proceed to Schedule Free Pickup
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => setStep(2)}
-              className="text-xs font-semibold text-zinc-500 hover:text-zinc-900"
-            >
-              ← Recalculate or Change Answers
-            </button>
           </div>
 
-          {/* How It Works Explainer */}
-          <div className="pt-6 border-t border-zinc-100 max-w-xl mx-auto space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 text-center">
-              How It Works?
+          {/* Big Estimated Value Card */}
+          <div className="p-6 rounded-3xl bg-emerald-50/40 border border-emerald-200 text-center space-y-2">
+            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">
+              Estimated Value
+            </span>
+            <p className="text-3xl sm:text-4xl font-black text-brand-emerald tracking-tight">
+              {formatPrice(quote.estimatedQuote)}
+            </p>
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-extrabold">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>+ ₹{quote.exchangeBonus.toLocaleString('en-IN')} Exchange Bonus</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Price Breakdown Card */}
+          <div className="p-5 rounded-2xl border border-zinc-200 bg-white space-y-3 text-xs">
+            <h4 className="font-bold text-sm text-zinc-900 pb-1 border-b border-zinc-100">
+              Price Breakdown
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-zinc-50 rounded-xl text-center space-y-1">
-                <span className="w-5 h-5 rounded-full bg-brand-black text-white inline-flex items-center justify-center text-[10px] font-bold">1</span>
-                <p className="font-bold text-zinc-900">Accept Quote</p>
-                <p className="text-[11px] text-zinc-500">Lock your valuation price</p>
+            <div className="space-y-2 text-zinc-600">
+              <div className="flex justify-between">
+                <span>Base Value</span>
+                <span className="font-semibold text-zinc-900">
+                  {formatPrice(quote.basePrice)}
+                </span>
               </div>
-              <div className="p-3 bg-zinc-50 rounded-xl text-center space-y-1">
-                <span className="w-5 h-5 rounded-full bg-brand-black text-white inline-flex items-center justify-center text-[10px] font-bold">2</span>
-                <p className="font-bold text-zinc-900">Free Pickup</p>
-                <p className="text-[11px] text-zinc-500">Doorstep inspection at your time</p>
+              <div className="flex justify-between">
+                <span>Condition Adjustment</span>
+                {(() => {
+                  const deduction = Math.max(0, quote.basePrice + quote.exchangeBonus - quote.estimatedQuote);
+                  return (
+                    <span className={deduction > 0 ? 'text-amber-700 font-semibold' : 'text-zinc-500'}>
+                      {deduction > 0 ? `- ${formatPrice(deduction)}` : '₹0 (Flawless)'}
+                    </span>
+                  );
+                })()}
               </div>
-              <div className="p-3 bg-zinc-50 rounded-xl text-center space-y-1">
-                <span className="w-5 h-5 rounded-full bg-brand-black text-white inline-flex items-center justify-center text-[10px] font-bold">3</span>
-                <p className="font-bold text-zinc-900">Instant Cash</p>
-                <p className="text-[11px] text-zinc-500">Instant UPI/Bank transfer</p>
+              <div className="flex justify-between text-brand-emerald font-semibold">
+                <span>Exchange Bonus</span>
+                <span>+ {formatPrice(quote.exchangeBonus)}</span>
+              </div>
+              <div className="border-t border-zinc-200 pt-2 flex justify-between font-black text-sm text-zinc-950">
+                <span>Estimated Value</span>
+                <span>{formatPrice(quote.estimatedQuote)}</span>
               </div>
             </div>
+          </div>
+
+          {/* Trust Points (Truck, Shield, Lock) */}
+          <div className="space-y-3 pt-1 text-xs">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+              <Truck className="w-4 h-4 text-brand-emerald shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-zinc-900">Free Doorstep Pickup</p>
+                <p className="text-[11px] text-zinc-500">Inspected at your convenience</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+              <CreditCard className="w-4 h-4 text-brand-emerald shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-zinc-900">Safe & Secure Payment</p>
+                <p className="text-[11px] text-zinc-500">Direct instant transfer to UPI / Bank</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+              <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-zinc-900">100% Data Security</p>
+                <p className="text-[11px] text-zinc-500">Military-grade data wipe guarantee</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Button */}
+          <div className="pt-2">
+            <button
+              onClick={handleProceedToPickup}
+              className="w-full py-4 bg-brand-emerald hover:bg-emerald-600 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+            >
+              Proceed to Pickup
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </motion.div>
       )}

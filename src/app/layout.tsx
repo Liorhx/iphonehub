@@ -7,6 +7,7 @@ import { WishlistProvider } from '../context/WishlistContext';
 import AnnouncementBar from '../components/layout/AnnouncementBar';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import BottomNav from '../components/layout/BottomNav';
 
 export const metadata: Metadata = {
   title: 'iPhoneHub | Premium Certified iPhones & Instant Resale Marketplace',
@@ -48,8 +49,9 @@ export default function RootLayout({
             <WishlistProvider>
               <AnnouncementBar />
               <Navbar />
-              <main className="flex-grow">{children}</main>
+              <main className="flex-grow pb-16 md:pb-0">{children}</main>
               <Footer />
+              <BottomNav />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

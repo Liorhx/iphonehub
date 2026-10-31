@@ -41,3 +41,13 @@ input:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px white inset;
 }
 
+/* Hide scrollbar for horizontal chip bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+

@@ -263,10 +263,15 @@ export default function ProductDetailPage({
               <span className="text-zinc-500 font-medium">({product.reviewsCount} verified reviews)</span>
             </div>
 
-            <h1 className="text-3xl font-extrabold text-zinc-950 tracking-tight">
-              {product.title}
-            </h1>
-            <p className="text-sm font-semibold text-zinc-600">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+                {product.title}
+              </h1>
+              <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-extrabold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                <Check className="w-3 h-3 stroke-[3]" /> Verified
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm font-semibold text-zinc-600">
               {product.storage} • {product.color} • {product.condition} Condition
             </p>
           </div>
@@ -290,12 +295,12 @@ export default function ProductDetailPage({
             </div>
             <p className="text-xs text-zinc-500 flex items-center gap-1.5 pt-1">
               <CreditCard className="w-3.5 h-3.5 text-zinc-400" />
-              No-Cost EMI starting from ₹{Math.round(product.price / 12).toLocaleString('en-IN')}/month
+              EMI starting from ₹{Math.round(product.price / 12).toLocaleString('en-IN')}/month
             </p>
           </div>
 
-          {/* Specs Mini Badges */}
-          <div className="grid grid-cols-3 gap-2.5 text-xs text-center">
+          {/* Specs Mini Badges (Camera, Display, Body) */}
+          <div className="grid grid-cols-3 gap-2 text-xs text-center">
             <div className="bg-white border border-zinc-200 rounded-xl p-2.5">
               <p className="text-zinc-400 text-[10px] uppercase font-bold">Storage</p>
               <p className="font-bold text-zinc-800 mt-0.5">{product.storage}</p>
@@ -315,21 +320,50 @@ export default function ProductDetailPage({
             <label className="text-xs font-bold uppercase tracking-wider text-zinc-600">
               Storage Capacity
             </label>
-            <div className="flex items-center gap-2">
-              {['128GB', '256GB', '512GB'].map((cap) => (
+            <div className="grid grid-cols-4 gap-2">
+              {['128GB', '256GB', '512GB', '1TB'].map((cap) => (
                 <button
                   key={cap}
                   type="button"
                   onClick={() => setSelectedStorage(cap)}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
+                  className={`py-2 text-xs font-bold rounded-xl border transition-all ${
                     selectedStorage === cap
-                      ? 'bg-brand-black text-white border-brand-black'
+                      ? 'bg-zinc-950 text-white border-zinc-950 shadow-xs'
                       : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:border-zinc-300'
                   }`}
                 >
                   {cap}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Condition Selector (Screen 3 in Mockup) */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-zinc-600">
+              Condition Grade
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { name: 'Excellent', desc: 'Like new' },
+                { name: 'Good', desc: 'Minor scratches' },
+                { name: 'Fair', desc: 'Visible wear' },
+              ].map((cond) => {
+                const isSelected = product.condition.toLowerCase().includes(cond.name.toLowerCase());
+                return (
+                  <div
+                    key={cond.name}
+                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                      isSelected
+                        ? 'border-brand-emerald bg-emerald-50/60 ring-1 ring-brand-emerald text-emerald-950 font-bold'
+                        : 'border-zinc-200 bg-zinc-50/60 text-zinc-600'
+                    }`}
+                  >
+                    <span className="text-xs font-bold block">{cond.name}</span>
+                    <span className="text-[10px] text-zinc-400 block">{cond.desc}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -499,6 +533,29 @@ export default function ProductDetailPage({
           </div>
         </div>
       )}
+
+      {/* Mobile Sticky Action Bar (Screen 3 in Mockup) */}
+      <div className="md:hidden fixed bottom-14 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-zinc-200/90 p-3 shadow-lg flex items-center gap-3">
+        <button
+          onClick={handleAddToCart}
+          disabled={addedSuccess}
+          className="flex-1 py-3 px-3 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-900 font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95"
+        >
+          {addedSuccess ? (
+            <>
+              <Check className="w-4 h-4 text-brand-emerald" /> Added
+            </>
+          ) : (
+            'Add to Cart'
+          )}
+        </button>
+        <button
+          onClick={handleBuyNow}
+          className="flex-1 py-3 px-3 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-1 shadow-md transition active:scale-95"
+        >
+          Buy Now
+        </button>
+      </div>
 
     </div>
   );

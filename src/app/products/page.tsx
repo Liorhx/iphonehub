@@ -114,49 +114,93 @@ function ProductsContent() {
     return result;
   }, [products, filters, sortBy]);
 
+  const families = ['All', 'iPhone 16', 'iPhone 15', 'iPhone 14', 'iPhone 13', 'iPhone 12'];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      {/* Page Title & Sort Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-8 border-b border-zinc-200">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
-            {filters.family ? `${filters.family} Series` : 'Buy Certified iPhones'}
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-            Showing {filteredProducts.length} verified devices with warranty and free shipping
-          </p>
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-10 space-y-5">
+      
+      {/* Mobile-Friendly Search Header */}
+      <div className="space-y-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search iPhone models, storage, color..."
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            className="w-full pl-10 pr-10 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald focus:bg-white transition"
+          />
+          <span className="absolute left-3.5 top-3.5 text-zinc-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          {filters.search && (
+            <button
+              onClick={() => handleFilterChange('search', '')}
+              className="absolute right-3 top-3 text-xs bg-zinc-200 text-zinc-600 rounded-full w-5 h-5 flex items-center justify-center hover:bg-zinc-300"
+            >
+              ×
+            </button>
+          )}
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Mobile Filter Button */}
-          <button
-            onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="lg:hidden flex items-center gap-1.5 px-4 py-2 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-xs font-semibold text-zinc-800 transition-colors"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            Filters {filters.family || filters.storage || filters.condition ? '(Active)' : ''}
-          </button>
-
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2 bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs">
-            <ArrowUpDown className="w-3.5 h-3.5 text-zinc-400" />
-            <span className="text-zinc-500 font-medium hidden sm:inline">Sort by:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="bg-transparent font-semibold text-zinc-900 focus:outline-none cursor-pointer"
+        {/* Filter Pills & Sort Row */}
+        <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar pb-1">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-xs font-bold text-zinc-800 transition"
             >
-              <option value="newest">Featured & Newest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="rating">Top Customer Rated</option>
-            </select>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+              {(filters.storage || filters.condition || filters.priceRange) && (
+                <span className="w-2 h-2 rounded-full bg-brand-emerald" />
+              )}
+            </button>
+
+            <div className="flex items-center gap-1 bg-zinc-100 rounded-xl px-2.5 py-1.5 text-xs font-bold text-zinc-800">
+              <ArrowUpDown className="w-3.5 h-3.5 text-zinc-500" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="bg-transparent text-xs font-bold text-zinc-800 focus:outline-none cursor-pointer"
+              >
+                <option value="newest">Sort: Featured</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+              </select>
+            </div>
           </div>
+
+          <span className="text-[11px] font-semibold text-zinc-500 shrink-0">
+            {filteredProducts.length} devices
+          </span>
+        </div>
+
+        {/* Horizontal Model Family Filter Chips (Screen 2 in Mockup) */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          {families.map((fam) => {
+            const isSelected = (fam === 'All' && !filters.family) || filters.family === fam;
+            return (
+              <button
+                key={fam}
+                onClick={() => handleFilterChange('family', fam === 'All' ? '' : fam)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                  isSelected
+                    ? 'bg-zinc-950 text-white shadow-xs'
+                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+                }`}
+              >
+                {fam}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Main Grid with Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block lg:col-span-1 sticky top-24">
           <FilterSidebar
@@ -168,7 +212,16 @@ function ProductsContent() {
 
         {/* Mobile Filter Drawer */}
         {mobileFilterOpen && (
-          <div className="lg:hidden col-span-1 mb-6">
+          <div className="lg:hidden col-span-1 mb-4 p-4 bg-zinc-50 rounded-2xl border border-zinc-200">
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-bold text-sm text-zinc-900">Refine Filters</span>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="text-xs font-bold text-brand-emerald"
+              >
+                Done
+              </button>
+            </div>
             <FilterSidebar
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -177,10 +230,10 @@ function ProductsContent() {
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* Products Grid (2-Column Mobile Grid Matching Screen 2 Mockup!) */}
         <div className="lg:col-span-3">
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}

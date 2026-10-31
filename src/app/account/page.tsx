@@ -73,22 +73,55 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
       
-      {/* Title */}
-      <div className="mb-8 pb-4 border-b border-zinc-200">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
-          Customer Account
-        </h1>
-        <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-          Welcome back, {session?.user?.name || session?.user?.email || 'Valued Customer'}
-        </p>
+      {/* Profile Header Card (Screens 9 & 10 in Mockup) */}
+      <div className="bg-white rounded-3xl border border-zinc-200/80 p-5 sm:p-6 mb-6 shadow-xs flex items-center gap-4">
+        <div className="w-14 h-14 rounded-full bg-zinc-900 text-white font-extrabold text-lg flex items-center justify-center shrink-0 border-2 border-emerald-500 shadow-sm">
+          {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'U'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg sm:text-xl font-black text-zinc-950 truncate">
+            {session?.user?.name || 'Customer Account'}
+          </h1>
+          <p className="text-xs text-zinc-500 truncate mt-0.5">
+            {session?.user?.email || 'Signed in via Google'}
+          </p>
+        </div>
+      </div>
+
+      {/* Mobile Horizontal Tabs (Screen 9 in Mockup) */}
+      <div className="lg:hidden flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-4">
+        {[
+          { id: 'orders', label: 'My Orders', icon: Package },
+          { id: 'tradeins', label: 'Trade-in Requests', icon: RotateCcw },
+          { id: 'wishlist', label: `Wishlist (${wishlist.length})`, icon: Heart },
+          { id: 'addresses', label: 'Addresses', icon: MapPin },
+          { id: 'profile', label: 'Profile', icon: UserIcon },
+        ].map((t) => {
+          const Icon = t.icon;
+          const isActive = activeTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id as typeof activeTab)}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-brand-emerald text-white shadow-xs'
+                  : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Sidebar (Matches layout in image 1!) */}
-        <div className="lg:col-span-3 bg-zinc-50 rounded-3xl border border-zinc-200/80 p-3 space-y-1">
+        {/* Desktop Left Sidebar */}
+        <div className="hidden lg:block lg:col-span-3 bg-zinc-50 rounded-3xl border border-zinc-200/80 p-3 space-y-1">
           <button
             onClick={() => setActiveTab('orders')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all ${

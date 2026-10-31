@@ -120,13 +120,13 @@ export default async function HomePage() {
                 <span>India&apos;s #1 Apple Certified Exchange</span>
               </div>
 
-              <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-                  Upgrade Your <br className="hidden sm:inline" />
-                  iPhone. <span className="text-brand-emerald">Hassle Free.</span>
+              <div className="space-y-3">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
+                  Premium iPhones. <br />
+                  <span className="text-brand-emerald">Better Prices.</span>
                 </h1>
-                <p className="text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
-                  Get the best resale value for your old iPhone or shop certified pre-owned iPhones with 6 months warranty and instant doorstep verification.
+                <p className="text-xs sm:text-base text-zinc-400 max-w-xl leading-relaxed">
+                  Trusted by 50,000+ customers. Certified pre-owned iPhones with 6 months warranty, doorstep verification, and instant resale cash.
                 </p>
               </div>
 
@@ -134,62 +134,60 @@ export default async function HomePage() {
               <form
                 action="/products"
                 method="GET"
-                className="bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-zinc-700/60 max-w-lg flex items-center gap-2"
+                className="bg-white/10 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl border border-zinc-700/60 max-w-lg flex items-center gap-2"
               >
-                <div className="flex-1 flex items-center pl-3 gap-2">
+                <div className="flex-1 flex items-center pl-2 sm:pl-3 gap-2">
                   <Search className="w-4 h-4 text-zinc-400" />
                   <input
                     type="text"
                     name="search"
-                    placeholder="Search iPhone 15, Pro Max, 128GB..."
-                    className="w-full bg-transparent text-sm text-white placeholder-zinc-400 focus:outline-none"
+                    placeholder="Search iPhone models, storage..."
+                    className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-zinc-400 focus:outline-none"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="bg-brand-emerald hover:bg-brand-emeraldHover text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
+                  className="bg-brand-emerald hover:bg-brand-emeraldHover text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
                 >
                   Search
                 </button>
               </form>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              {/* Action Buttons (Matching Screen 1 in Mockup) */}
+              <div className="flex items-center gap-3 pt-1">
                 <Link
                   href="/products"
-                  className="bg-white text-brand-black px-6 py-3.5 rounded-2xl font-bold text-sm hover:bg-zinc-100 transition-all shadow-lg flex items-center gap-2"
+                  className="flex-1 sm:flex-none justify-center bg-white text-brand-black px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm hover:bg-zinc-100 transition-all shadow-lg flex items-center gap-2 active:scale-95"
                 >
                   Explore iPhones
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
                   href="/sell"
-                  className="bg-zinc-900 border border-zinc-700 text-white px-6 py-3.5 rounded-2xl font-bold text-sm hover:bg-zinc-800 transition-all flex items-center gap-2"
+                  className="flex-1 sm:flex-none justify-center bg-zinc-900 border border-zinc-700 text-white px-5 py-3 rounded-2xl font-bold text-xs sm:text-sm hover:bg-zinc-800 transition-all flex items-center gap-2 active:scale-95"
                 >
-                  Sell Your iPhone
-                  <span className="bg-brand-emerald text-[10px] text-white font-extrabold px-1.5 py-0.5 rounded">
-                    +₹2,500 Bonus
-                  </span>
+                  Sell / Trade-in
+                  <ArrowRight className="w-3.5 h-3.5 text-brand-emerald" />
                 </Link>
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-zinc-800/80 text-xs text-zinc-400">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span>Best Prices in India</span>
-                </div>
-                <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-zinc-800/80 text-[11px] sm:text-xs text-zinc-400">
+                <div className="flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span>100% Genuine & Tested</span>
+                  <span>100% Original</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
+                  <span>Verified & Tested</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-brand-emerald shrink-0" />
+                  <span>Fast & Secure Delivery</span>
+                </div>
+                <div className="flex items-center gap-1.5">
                   <CreditCard className="w-4 h-4 text-brand-emerald shrink-0" />
                   <span>Safe & Secure Payments</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span>Pan India Delivery</span>
                 </div>
               </div>
             </div>
@@ -329,7 +327,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
@@ -339,13 +337,13 @@ export default async function HomePage() {
       {/* BEST DEALS & VALUE PICKS */}
       {bestDeals.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-zinc-50 rounded-3xl p-6 sm:p-10 border border-zinc-200/80">
-            <div className="flex items-center justify-between mb-8">
+          <div className="bg-zinc-50 rounded-3xl p-4 sm:p-10 border border-zinc-200/80">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-emerald flex items-center gap-1.5 mb-1">
                   <Zap className="w-4 h-4" /> Limited Stock Drop
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
+                <h2 className="text-xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
                   Best Value Deals
                 </h2>
               </div>
@@ -357,7 +355,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {bestDeals.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
@@ -366,18 +364,18 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* WHY CHOOSE IPHONEHUB */}
+      {/* WHY CHOOSE IPHONEHUB (Screen 1 in Mockup) */}
       <section id="why-us" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl font-extrabold text-zinc-900 tracking-tight">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
             Why Choose iPhoneHub?
           </h2>
-          <p className="text-sm text-zinc-500 mt-2">
-            The smarter, safer, and more rewarding way to buy and sell Apple devices in India.
+          <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+            The smarter, safer, and most rewarding way to buy and sell Apple devices in India.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           
           <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 space-y-3 hover:shadow-cardHover transition-shadow">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-brand-emerald flex items-center justify-center font-bold">

@@ -288,14 +288,29 @@ export default function CartPage() {
             {/* Continue to Payment CTA */}
             <button
               onClick={() => router.push('/checkout')}
-              className="w-full py-4 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full py-4 bg-brand-emerald hover:bg-emerald-600 text-white rounded-2xl font-extrabold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
             >
-              Continue to Payment
+              Proceed to Checkout
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
+      </div>
+
+      {/* Mobile Sticky Checkout Bar (Screen 6 in Mockup) */}
+      <div className="md:hidden fixed bottom-14 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-zinc-200/90 p-3 shadow-lg flex items-center justify-between gap-4">
+        <div>
+          <span className="text-[10px] text-zinc-500 font-semibold block uppercase">Total Amount</span>
+          <span className="text-lg font-black text-zinc-950 block -mt-0.5">{formatPrice(finalTotal)}</span>
+        </div>
+        <button
+          onClick={() => router.push('/checkout')}
+          className="flex-1 py-3 px-5 bg-brand-emerald hover:bg-emerald-600 text-white rounded-xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95"
+        >
+          Proceed to Checkout
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
       </div>
 
     </div>

@@ -340,10 +340,10 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-6 sm:space-y-8">
       
       {/* Checkout Progress Stepper (2 Clean Steps) */}
-      <div className="flex items-center justify-center gap-6 sm:gap-8 text-xs font-bold border-b border-zinc-200 pb-6">
+      <div className="flex items-center justify-center gap-6 sm:gap-8 text-xs font-bold border-b border-zinc-200 pb-5">
         <Link href="/cart" className="flex items-center gap-2 text-zinc-400 hover:text-zinc-700 transition">
           <span className="w-6 h-6 rounded-full bg-emerald-100 text-brand-emerald flex items-center justify-center text-[11px] font-bold">
             <Check className="w-3.5 h-3.5" />
@@ -359,11 +359,11 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         
         {/* Left Column: Shipping & Direct Pay Form */}
         <div className="lg:col-span-7">
-          <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 sm:p-8 space-y-6 shadow-subtle">
+          <div className="bg-white rounded-3xl border border-zinc-200/80 p-4 sm:p-8 space-y-5 sm:space-y-6 shadow-subtle">
             <div>
               <h2 className="text-xl font-extrabold text-zinc-900">Delivery & Payment</h2>
               <p className="text-xs text-zinc-500 mt-1">
