@@ -46,8 +46,8 @@ const PROMO_SLIDES: PromoSlide[] = [
     borderColor: 'border-blue-900/60',
     glowColor: 'bg-cyan-500/25',
     badgeBg: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=940&hei=1112&fmt=png-alpha',
-    imageAlt: 'iPhone 16 Ultramarine Exchange',
+    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-bluetitanium-select?wid=940&hei=1112&fmt=png-alpha',
+    imageAlt: 'iPhone 15 Pro Blue Titanium Exchange',
   },
   {
     id: 'warranty',
@@ -60,8 +60,8 @@ const PROMO_SLIDES: PromoSlide[] = [
     borderColor: 'border-purple-900/60',
     glowColor: 'bg-purple-500/25',
     badgeBg: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
-    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=940&hei=1112&fmt=png-alpha',
-    imageAlt: 'Certified iPhone 16 Pro Desert Titanium',
+    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-deeppurple-select?wid=940&hei=1112&fmt=png-alpha',
+    imageAlt: 'Certified iPhone 14 Pro Deep Purple',
   },
   {
     id: 'emi',
@@ -74,8 +74,8 @@ const PROMO_SLIDES: PromoSlide[] = [
     borderColor: 'border-amber-900/60',
     glowColor: 'bg-amber-500/25',
     badgeBg: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pink-select-202309?wid=940&hei=1112&fmt=png-alpha',
-    imageAlt: 'iPhone 15 EMI Deals',
+    image: 'https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-pro-gold-select?wid=940&hei=1112&fmt=png-alpha',
+    imageAlt: 'iPhone 14 Pro Gold EMI Deals',
   },
 ];
 

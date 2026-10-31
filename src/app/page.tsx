@@ -185,8 +185,8 @@ export default async function HomePage() {
               {/* Secondary Layered 3D iPhone (Adds true 3D spatial depth) */}
               <div className="absolute w-28 h-48 right-3 top-2 z-0 opacity-70 animate-floatLag pointer-events-none">
                 <Image
-                  src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=940&hei=1112&fmt=png-alpha"
-                  alt="iPhone 16 Pro Black Titanium"
+                  src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-blacktitanium-select?wid=940&hei=1112&fmt=png-alpha"
+                  alt="iPhone 15 Pro Black Titanium"
                   fill
                   className="object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.85)] scale-95 rotate-[-4deg]"
                 />
