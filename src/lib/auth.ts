@@ -40,8 +40,7 @@ export const authOptions: NextAuthOptions = {
         const isAllowedAdminEmail =
           allowedAdmins.includes(email) ||
           email.includes('admin') ||
-          email === 'yadav962160@gmail.com' ||
-          email === 'admin@iphonehub.in';
+          email === 'yadav962160@gmail.com';
 
         const isAdmin = isOtpVerified && isAllowedAdminEmail;
 
