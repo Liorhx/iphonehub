@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../components/providers/AuthProvider';
 import { CartProvider } from '../context/CartContext';
@@ -8,6 +9,13 @@ import AnnouncementBar from '../components/layout/AnnouncementBar';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import BottomNav from '../components/layout/BottomNav';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'iPhoneHub | Premium Certified iPhones & Instant Resale Marketplace',
@@ -29,16 +37,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={`${montserrat.variable} ${montserrat.className} scroll-smooth`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-white text-brand-black antialiased">
+      <body className={`${montserrat.className} min-h-screen flex flex-col bg-white text-brand-black antialiased`}>
         {/* Official Razorpay Checkout Script */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"

@@ -375,35 +375,136 @@ export default async function HomePage() {
           {/* Section: Dynamic Promo Cards Carousel */}
           <PromoCarousel />
 
-          {/* Section: Why Choose iPhoneHub? (4 horizontal icons) */}
-          <div>
-            <h3 className="font-extrabold text-base text-zinc-900 mb-3">
-              Why Choose iPhoneHub?
-            </h3>
-            <div className="grid grid-cols-4 gap-2 text-center">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-800 shadow-xs">
-                  <Tag className="w-5 h-5 text-zinc-800 stroke-[1.8]" />
-                </div>
-                <span className="text-[11px] font-medium text-zinc-800 mt-1.5 leading-tight">Best Prices</span>
+          {/* Section: Why Choose iPhoneHub? (Horizontally Infinite Marquee Strip) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-black text-base text-zinc-950 tracking-tight">
+                  Why Choose iPhoneHub?
+                </h3>
+                <p className="text-[11px] text-zinc-500 font-medium">India&apos;s most trusted certified Apple marketplace</p>
               </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-800 shadow-xs">
-                  <ShieldCheck className="w-5 h-5 text-zinc-800 stroke-[1.8]" />
-                </div>
-                <span className="text-[11px] font-medium text-zinc-800 mt-1.5 leading-tight">Verified Devices</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-800 shadow-xs">
-                  <Truck className="w-5 h-5 text-zinc-800 stroke-[1.8]" />
-                </div>
-                <span className="text-[11px] font-medium text-zinc-800 mt-1.5 leading-tight">Fast Delivery</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-800 shadow-xs">
-                  <Lock className="w-5 h-5 text-zinc-800 stroke-[1.8]" />
-                </div>
-                <span className="text-[11px] font-medium text-zinc-800 mt-1.5 leading-tight">Secure Payments</span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60 shrink-0">
+                <Sparkles className="w-3 h-3 text-[#00DF82]" />
+                Certified
+              </span>
+            </div>
+
+            {/* Infinite Scrolling Marquee Strip */}
+            <div className="relative -mx-4 overflow-hidden bg-gradient-to-r from-[#080A0E] via-[#0E131C] to-[#080A0E] py-3.5 border-y border-zinc-800/80 shadow-inner group">
+              {/* Left & Right Smooth Fade Masks */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#080A0E] to-transparent z-10" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#080A0E] to-transparent z-10" />
+
+              {/* Marquee Track (Duplicated 2x for Seamless Infinite Loop) */}
+              <div className="animate-marquee flex items-center gap-3">
+                {[
+                  {
+                    icon: Tag,
+                    title: 'Best Prices Guaranteed',
+                    sub: 'Save up to 40% vs retail',
+                    glow: 'bg-emerald-500/20 text-[#00DF82] border-emerald-500/30',
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: '48-Point Diagnostic Audit',
+                    sub: '100% genuine Apple components',
+                    glow: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+                  },
+                  {
+                    icon: Truck,
+                    title: 'Free Express Delivery',
+                    sub: 'Insured transit via BlueDart',
+                    glow: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                  },
+                  {
+                    icon: Lock,
+                    title: 'Secure Razorpay Checkout',
+                    sub: 'UPI, Cards & 0% EMI',
+                    glow: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                  },
+                  {
+                    icon: RotateCcw,
+                    title: '7-Day Doorstep Replacement',
+                    sub: 'Hassle-free exchange policy',
+                    glow: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+                  },
+                  {
+                    icon: Zap,
+                    title: 'Instant UPI Trade-in Payout',
+                    sub: 'Direct cash before device pickup',
+                    glow: 'bg-emerald-500/20 text-[#00DF82] border-emerald-500/30',
+                  },
+                  {
+                    icon: CheckCircle2,
+                    title: '1-Year Full Warranty',
+                    sub: 'Comprehensive hardware protection',
+                    glow: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+                  },
+                ].concat([
+                  {
+                    icon: Tag,
+                    title: 'Best Prices Guaranteed',
+                    sub: 'Save up to 40% vs retail',
+                    glow: 'bg-emerald-500/20 text-[#00DF82] border-emerald-500/30',
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: '48-Point Diagnostic Audit',
+                    sub: '100% genuine Apple components',
+                    glow: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+                  },
+                  {
+                    icon: Truck,
+                    title: 'Free Express Delivery',
+                    sub: 'Insured transit via BlueDart',
+                    glow: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                  },
+                  {
+                    icon: Lock,
+                    title: 'Secure Razorpay Checkout',
+                    sub: 'UPI, Cards & 0% EMI',
+                    glow: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                  },
+                  {
+                    icon: RotateCcw,
+                    title: '7-Day Doorstep Replacement',
+                    sub: 'Hassle-free exchange policy',
+                    glow: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+                  },
+                  {
+                    icon: Zap,
+                    title: 'Instant UPI Trade-in Payout',
+                    sub: 'Direct cash before device pickup',
+                    glow: 'bg-emerald-500/20 text-[#00DF82] border-emerald-500/30',
+                  },
+                  {
+                    icon: CheckCircle2,
+                    title: '1-Year Full Warranty',
+                    sub: 'Comprehensive hardware protection',
+                    glow: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+                  },
+                ]).map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 rounded-2xl py-2 px-3.5 flex items-center gap-3 shrink-0 backdrop-blur-md transition-colors"
+                    >
+                      <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${item.glow}`}>
+                        <Icon className="w-4 h-4 stroke-[2.2]" />
+                      </div>
+                      <div className="text-left">
+                        <span className="font-black text-xs text-white tracking-tight block whitespace-nowrap">
+                          {item.title}
+                        </span>
+                        <span className="text-[10px] text-zinc-400 font-medium block whitespace-nowrap">
+                          {item.sub}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

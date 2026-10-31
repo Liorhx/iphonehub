@@ -20,7 +20,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["Montserrat", "var(--font-montserrat)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
       },
       boxShadow: {
         subtle: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
@@ -31,11 +31,16 @@ module.exports = {
       animation: {
         float: "float 6s ease-in-out infinite",
         pulseSlow: "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        marquee: "marquee 26s linear infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
         },
       },
     },
