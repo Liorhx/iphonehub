@@ -11,18 +11,36 @@ import {
   Package,
   Loader2,
   Lock,
+  Mail,
+  ArrowRight,
   ArrowLeft,
   CheckCircle2,
+  AlertCircle,
+  UserCheck,
+  Shield,
 } from 'lucide-react';
 
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get('callbackUrl') || '/account';
-  const { data: session, status } = useSession();
-  const [signingIn, setSigningIn] = useState(false);
+  const urlError = searchParams?.get('error');
 
-  // If already authenticated, redirect to callbackUrl or account page
+  const { data: session, status } = useSession();
+
+  const [authMethod, setAuthMethod] = useState<'email' | 'google'>('email');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [error, setError] = useState<string>(
+    urlError === 'OAuthCallback' || urlError === 'OAuthSignin'
+      ? 'Google Sign-In was cancelled or configuration mismatch. Please use Email Sign-In below.'
+      : ''
+  );
+
+  // If already authenticated, redirect to callbackUrl
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       router.push(callbackUrl);
@@ -30,30 +48,88 @@ function SignInContent() {
   }, [status, session, router, callbackUrl]);
 
   const handleGoogleSignIn = () => {
-    setSigningIn(true);
+    setGoogleLoading(true);
+    setError('');
     signIn('google', { callbackUrl });
+  };
+
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email address.');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await signIn('credentials', {
+        redirect: false,
+        email: email.trim().toLowerCase(),
+        password,
+        name: name.trim() || email.split('@')[0],
+      });
+
+      if (res?.error) {
+        setError(res.error === 'CredentialsSignin' ? 'Invalid email or password.' : res.error);
+      } else {
+        router.push(callbackUrl);
+      }
+    } catch (err: unknown) {
+      console.error('Credentials signin error:', err);
+      setError('An unexpected error occurred during sign-in.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickCustomerDemo = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await signIn('credentials', {
+        redirect: false,
+        email: 'customer.demo@iphonehub.in',
+        name: 'Rahul Yadav',
+        password: 'democustomerpass',
+      });
+
+      if (res?.error) {
+        setError(res.error);
+      } else {
+        router.push(callbackUrl);
+      }
+    } catch {
+      setError('Failed to log in with demo account.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-gradient-to-b from-zinc-50 via-white to-zinc-100">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-zinc-200/80 p-8 sm:p-10 space-y-8 shadow-2xl relative overflow-hidden">
-        
+      <div className="max-w-md w-full bg-white rounded-3xl border border-zinc-200/80 p-8 sm:p-10 space-y-6 shadow-2xl relative overflow-hidden">
         {/* Top Emerald Accent Glow Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-500" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-indigo-500" />
 
         {/* Header & Brand Identity */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center justify-center group">
-            <div className="w-14 h-14 rounded-2xl bg-brand-black flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-300">
+            <div className="w-13 h-13 rounded-2xl bg-brand-black flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-300">
               <Smartphone className="w-7 h-7 text-brand-emerald" />
             </div>
           </Link>
           <div className="space-y-1">
             <h1 className="text-2xl font-black text-zinc-950 tracking-tight sm:text-3xl">
-              Welcome to iPhoneHub
+              Customer Sign In
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-500 max-w-xs mx-auto leading-relaxed">
-              Sign in or create your customer account with one click to manage orders and trade-ins.
+            <p className="text-xs text-zinc-500 max-w-xs mx-auto leading-relaxed">
+              Sign in to manage orders, doorstep trade-in valuations, and saved addresses.
             </p>
           </div>
         </div>
@@ -65,24 +141,32 @@ function SignInContent() {
             <div className="space-y-1">
               <p className="font-extrabold text-sm text-emerald-950">Already Signed In</p>
               <p className="text-xs text-emerald-700">
-                Welcome back, {session.user.name || session.user.email}! Redirecting to your account...
+                Welcome back, {session.user.name || session.user.email}! Redirecting...
               </p>
             </div>
             <Loader2 className="w-4 h-4 animate-spin text-emerald-600 mx-auto" />
           </div>
         ) : (
-          /* Main Google Authentication Block */
-          <div className="space-y-6">
-            
+          <div className="space-y-5">
+            {/* Error banner */}
+            {error && (
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span className="leading-relaxed font-semibold">{error}</span>
+              </div>
+            )}
+
+            {/* Google OAuth Option */}
             <button
+              type="button"
               onClick={handleGoogleSignIn}
-              disabled={signingIn || status === 'loading'}
-              className="w-full py-4 px-5 rounded-2xl border-2 border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 font-bold text-xs sm:text-sm text-zinc-800 transition-all flex items-center justify-center gap-3 shadow-md hover:shadow-lg active:scale-[0.99] group cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={googleLoading || loading}
+              className="w-full py-3.5 px-4 rounded-2xl border-2 border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 font-bold text-xs sm:text-sm text-zinc-800 transition-all flex items-center justify-center gap-3 shadow-xs hover:shadow-md active:scale-[0.99] group cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {signingIn ? (
+              {googleLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin text-brand-emerald" />
-                  <span>Connecting to Google...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-brand-emerald" />
+                  <span>Connecting with Google...</span>
                 </>
               ) : (
                 <>
@@ -111,44 +195,132 @@ function SignInContent() {
               )}
             </button>
 
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="h-px bg-zinc-200 flex-1" />
+              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                Or Sign In with Email
+              </span>
+              <div className="h-px bg-zinc-200 flex-1" />
+            </div>
+
+            {/* Email & Password Form */}
+            <form onSubmit={handleCredentialsSubmit} className="space-y-3.5">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-zinc-700">Email Address</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald transition"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-zinc-700">Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3.5" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald transition"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-zinc-500">
+                  Full Name <span className="text-zinc-400 font-normal">(Optional for new accounts)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Rahul Yadav"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-brand-emerald transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || googleLoading}
+                className="w-full py-3.5 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-brand-emerald" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In / Create Account</span>
+                    <ArrowRight className="w-4 h-4 text-brand-emerald" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Quick 1-Click Demo Customer Access */}
+            <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/80 space-y-2 text-center">
+              <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block">
+                Instant Customer Demo
+              </span>
+              <button
+                type="button"
+                onClick={handleQuickCustomerDemo}
+                disabled={loading}
+                className="w-full py-2.5 px-3 rounded-xl bg-white border border-zinc-200 hover:border-brand-emerald text-xs font-bold text-zinc-800 transition-colors shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4 text-brand-emerald" />
+                <span>Continue as Demo Customer</span>
+              </button>
+            </div>
+
             {/* Value Proposition Pills */}
-            <div className="bg-zinc-50 rounded-2xl border border-zinc-200/70 p-4 space-y-2.5 text-xs text-zinc-600">
+            <div className="bg-zinc-50/70 rounded-2xl border border-zinc-200/60 p-3.5 space-y-2 text-xs text-zinc-600">
               <div className="flex items-center gap-2.5">
                 <Zap className="w-4 h-4 text-brand-emerald shrink-0" />
-                <span className="font-semibold text-zinc-800">Instant 1-Click Access</span>
-                <span className="text-zinc-400 text-[11px]">— No passwords to remember</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Package className="w-4 h-4 text-brand-emerald shrink-0" />
-                <span className="font-semibold text-zinc-800">Live Order Tracking</span>
-                <span className="text-zinc-400 text-[11px]">— Instant BlueDart dispatch updates</span>
+                <span className="font-semibold text-zinc-800">100% Seamless</span>
+                <span className="text-zinc-400 text-[11px]">— Instant order & trade-in tracking</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
-                <span className="font-semibold text-zinc-800">Secure & Private</span>
-                <span className="text-zinc-400 text-[11px]">— Protected by Google OAuth 2.0</span>
+                <span className="font-semibold text-zinc-800">Secure Sessions</span>
+                <span className="text-zinc-400 text-[11px]">— 256-bit encrypted authentication</span>
               </div>
             </div>
 
-            {/* Footer / Privacy note */}
-            <div className="text-center space-y-3 pt-2">
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                By continuing with Google, you agree to iPhoneHub's Terms of Service and Privacy Policy.
-              </p>
+            {/* Footer Navigation */}
+            <div className="text-center space-y-2.5 pt-1">
+              <div>
+                <Link
+                  href="/admin/login"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-colors"
+                >
+                  <Shield className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Admin Portal Gateway →</span>
+                </Link>
+              </div>
               <div>
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition-colors"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  Return to Storefront
+                  <span>Return to Storefront</span>
                 </Link>
               </div>
             </div>
-
           </div>
         )}
-
       </div>
     </div>
   );

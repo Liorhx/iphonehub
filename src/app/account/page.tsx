@@ -14,16 +14,13 @@ import {
   ChevronRight,
   LogOut,
   LayoutDashboard,
-  ArrowLeft,
   Trash2,
-  ExternalLink,
   Phone,
   Mail,
-  Check,
-  Plus,
   ShoppingBag,
-  ShieldCheck,
   X,
+  Loader2,
+  Lock,
 } from 'lucide-react';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
@@ -33,18 +30,63 @@ import SettingsView from '@/components/account/SettingsView';
 
 export default function AccountPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { wishlist, toggleWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   // Active modal/panel view: null (main menu) | 'wishlist' | 'addresses' | 'support' | 'settings'
   const [activeModal, setActiveModal] = useState<'wishlist' | 'addresses' | 'support' | 'settings' | null>(null);
 
-  const isAdmin = (session?.user as unknown as { role?: string })?.role === 'admin';
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-3">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-emerald" />
+        <p className="text-xs font-semibold text-zinc-500">Loading your account...</p>
+      </div>
+    );
+  }
 
-  const userName = session?.user?.name || 'Rahul Yadav';
-  const userEmail = session?.user?.email || 'rahul@gmail.com';
-  const userImage = session?.user?.image;
+  // Unauthenticated State: Show Sign-In Prompt
+  if (status === 'unauthenticated' || !session?.user) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full bg-white rounded-3xl border border-zinc-200/90 p-8 sm:p-10 text-center space-y-6 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-zinc-100 flex items-center justify-center mx-auto text-zinc-800">
+            <Lock className="w-7 h-7 text-brand-emerald" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-zinc-950 tracking-tight">
+              Sign In to Your Account
+            </h2>
+            <p className="text-xs text-zinc-500 leading-relaxed max-w-xs mx-auto">
+              Please sign in with your account to view your orders, trade-in requests, saved addresses, and profile settings.
+            </p>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Link
+              href="/auth/signin?callbackUrl=/account"
+              className="w-full py-3.5 bg-brand-black hover:bg-zinc-800 text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2"
+            >
+              Sign In / Register
+            </Link>
+            <Link
+              href="/"
+              className="block text-xs font-semibold text-zinc-400 hover:text-zinc-600 transition"
+            >
+              ← Return to Storefront
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isAdmin = (session.user as unknown as { role?: string })?.role === 'admin';
+  const userName = session.user.name || session.user.email?.split('@')[0] || 'Customer';
+  const userEmail = session.user.email || '';
+  const userImage = session.user.image;
 
   // Render Saved Addresses dedicated view when active
   if (activeModal === 'addresses') {
@@ -55,7 +97,7 @@ export default function AccountPage() {
     );
   }
 
-  // Render Settings dedicated view matching user mockup when active
+  // Render Settings dedicated view when active
   if (activeModal === 'settings') {
     return (
       <div className="min-h-[85vh] bg-[#FBFBFC] py-4 pb-24">
@@ -77,12 +119,12 @@ export default function AccountPage() {
             className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-full text-xs font-bold hover:bg-purple-100 transition"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            Admin
+            Admin Dashboard
           </Link>
         )}
       </div>
 
-      {/* User Profile Card (Matching User Mockup) */}
+      {/* User Profile Card */}
       <div className="bg-white rounded-3xl border border-zinc-200/80 p-5 shadow-xs flex items-center gap-4">
         <div className="relative w-16 h-16 rounded-full bg-[#8EA1B4] flex items-center justify-center shrink-0 overflow-hidden shadow-xs border border-zinc-100">
           {userImage ? (
@@ -94,18 +136,24 @@ export default function AccountPage() {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-base sm:text-lg font-extrabold text-zinc-950 truncate tracking-tight">
-            {userName}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-zinc-950 truncate tracking-tight">
+              {userName}
+            </h2>
+            {isAdmin && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                Admin
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-zinc-500 font-medium truncate mt-0.5">
             {userEmail}
           </p>
         </div>
       </div>
 
-      {/* Menu Action Cards Stack (Matching User Mockup Pixel-by-Pixel) */}
+      {/* Menu Action Cards Stack */}
       <div className="space-y-2.5">
-        
         {/* 1. My Orders */}
         <Link
           href="/orders"
@@ -126,7 +174,7 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={() => setActiveModal('wishlist')}
-          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left"
+          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left cursor-pointer"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-6 h-6 flex items-center justify-center text-zinc-900">
@@ -143,7 +191,7 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={() => setActiveModal('addresses')}
-          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left"
+          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left cursor-pointer"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-6 h-6 flex items-center justify-center text-zinc-900">
@@ -160,7 +208,7 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={() => setActiveModal('support')}
-          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left"
+          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left cursor-pointer"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-6 h-6 flex items-center justify-center text-zinc-900">
@@ -177,7 +225,7 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={() => setActiveModal('settings')}
-          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left"
+          className="w-full bg-white rounded-2xl sm:rounded-3xl border border-zinc-200/80 p-4 sm:p-5 flex items-center justify-between shadow-xs hover:border-zinc-300 hover:shadow-subtle transition-all active:scale-[0.99] group text-left cursor-pointer"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-6 h-6 flex items-center justify-center text-zinc-900">
@@ -189,7 +237,6 @@ export default function AccountPage() {
           </div>
           <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
         </button>
-
       </div>
 
       {/* Log Out CTA */}
@@ -197,16 +244,14 @@ export default function AccountPage() {
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="w-full py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors active:scale-95"
+          className="w-full py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors active:scale-95 cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           <span>Log Out</span>
         </button>
       </div>
 
-      {/* =========================================================================
-          MODAL 1: WISHLIST DRAWER
-          ========================================================================= */}
+      {/* Wishlist Drawer */}
       {activeModal === 'wishlist' && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-3xl p-6 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -282,11 +327,7 @@ export default function AccountPage() {
         </div>
       )}
 
-
-
-      {/* =========================================================================
-          MODAL 3: SUPPORT TICKETS & 24/7 HELPDESK
-          ========================================================================= */}
+      {/* Support Drawer */}
       {activeModal === 'support' && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto shadow-2xl">
@@ -357,9 +398,6 @@ export default function AccountPage() {
           </div>
         </div>
       )}
-
-
-
     </div>
   );
 }

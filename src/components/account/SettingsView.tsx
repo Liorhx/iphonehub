@@ -38,8 +38,8 @@ type SubModal =
 
 export default function SettingsView({ onBack }: SettingsViewProps) {
   const { data: session } = useSession();
-  const userName = session?.user?.name || 'Rahul Yadav';
-  const userEmail = session?.user?.email || 'rahul@gmail.com';
+  const userName = session?.user?.name || session?.user?.email?.split('@')[0] || 'Customer';
+  const userEmail = session?.user?.email || 'Not provided';
 
   // Dark Mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(false);
