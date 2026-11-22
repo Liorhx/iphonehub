@@ -16,7 +16,6 @@ import {
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
-  UserCheck,
   Shield,
 } from 'lucide-react';
 
@@ -83,29 +82,6 @@ function SignInContent() {
     } catch (err: unknown) {
       console.error('Credentials signin error:', err);
       setError('An unexpected error occurred during sign-in.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickCustomerDemo = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await signIn('credentials', {
-        redirect: false,
-        email: 'customer.demo@iphonehub.in',
-        name: 'Rahul Yadav',
-        password: 'democustomerpass',
-      });
-
-      if (res?.error) {
-        setError(res.error);
-      } else {
-        router.push(callbackUrl);
-      }
-    } catch {
-      setError('Failed to log in with demo account.');
     } finally {
       setLoading(false);
     }
@@ -267,22 +243,6 @@ function SignInContent() {
                 )}
               </button>
             </form>
-
-            {/* Quick 1-Click Demo Customer Access */}
-            <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200/80 space-y-2 text-center">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block">
-                Instant Customer Demo
-              </span>
-              <button
-                type="button"
-                onClick={handleQuickCustomerDemo}
-                disabled={loading}
-                className="w-full py-2.5 px-3 rounded-xl bg-white border border-zinc-200 hover:border-brand-emerald text-xs font-bold text-zinc-800 transition-colors shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <UserCheck className="w-4 h-4 text-brand-emerald" />
-                <span>Continue as Demo Customer</span>
-              </button>
-            </div>
 
             {/* Value Proposition Pills */}
             <div className="bg-zinc-50/70 rounded-2xl border border-zinc-200/60 p-3.5 space-y-2 text-xs text-zinc-600">
